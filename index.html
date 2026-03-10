@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group Meal Tracker - E.C Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary-orange: #e67e22;
@@ -33,6 +34,7 @@
         .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-add { background: var(--primary-orange); color: white; width: 80px; margin: 0; }
         .btn-save { background: var(--secondary-green); color: white; font-size: 18px; }
+        .btn-qr { background: #2c3e50; color: white; margin-top: 15px; }
         .btn-export { background: #3498db; color: white; }
         .btn-clear { background: #e74c3c; color: white; margin-top: 20px; padding: 8px 15px; width: auto; }
         
@@ -45,7 +47,7 @@
         .summary-box { background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid var(--secondary-green); }
         .summary-item { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
 
-        /* MODERN NOTIFICATION CSS */
+        /* MODERN NOTIFICATION & QR CSS */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
@@ -63,6 +65,7 @@
         .m-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .m-confirm { background: var(--primary-orange); color: white; }
         .m-cancel { background: #f1f1f1; color: #777; }
+        #qrcode { display: flex; justify-content: center; margin-bottom: 20px; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { to { transform: scale(1); } }
@@ -106,6 +109,7 @@
 
         <div class="student-grid" id="studentGrid"></div>
         <button class="btn btn-save" onclick="saveToHistory()">Save Daily Record</button>
+        <button class="btn btn-qr" onclick="showShareQR()">📲 Share App via QR Code</button>
     </div>
 
     <div class="history-section">
@@ -139,7 +143,7 @@
         <div class="modal-content">
             <div id="modalHead" class="modal-head">Notification</div>
             <div id="modalBody" class="modal-body">Message text here...</div>
-            <div id="modalFooter" class="modal-footer">
+            <div id="qrcode"></div> <div id="modalFooter" class="modal-footer">
                 <button id="modalCancel" class="m-btn m-cancel" onclick="closeModal()">Cancel</button>
                 <button id="modalConfirm" class="m-btn m-confirm">OK</button>
             </div>
@@ -157,11 +161,13 @@
         let autoCloseTimer;
 
         // MODAL LOGIC
-        function showNotification(title, msg, onConfirm = null, isConfirmType = false) {
+        function showNotification(title, msg, onConfirm = null, isConfirmType = false, isQR = false) {
             const modal = document.getElementById('modernModal');
             const confirmBtn = document.getElementById('modalConfirm');
             const cancelBtn = document.getElementById('modalCancel');
+            const qrContainer = document.getElementById('qrcode');
             
+            qrContainer.innerHTML = ""; // Clear any previous QR code
             document.getElementById('modalHead').innerText = title;
             document.getElementById('modalBody').innerText = msg;
             
@@ -170,15 +176,36 @@
 
             confirmBtn.onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
 
-            // Auto-close after 5 seconds if it's just an alert (not a confirm)
+            // Auto-close logic
             clearTimeout(autoCloseTimer);
-            if(!isConfirmType) {
+            if(!isConfirmType && !isQR) {
                 autoCloseTimer = setTimeout(closeModal, 5000);
             }
         }
 
+        // QR CODE LOGIC
+        function showShareQR() {
+            showNotification("Share with Friends", "Let others scan this to open the Non-Cafe system on their phone.", null, false, true);
+            const qrContainer = document.getElementById('qrcode');
+            
+            // This automatically detects your GitHub URL when the site is live
+            const currentURL = window.location.href;
+            
+            new QRCode(qrContainer, {
+                text: currentURL,
+                width: 200,
+                height: 200,
+                colorDark : "#2c3e50",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            
+            document.getElementById('modalConfirm').innerText = "Close";
+        }
+
         function closeModal() {
             document.getElementById('modernModal').style.display = 'none';
+            document.getElementById('modalConfirm').innerText = "OK"; // Reset button text
         }
 
         function getEthiopianDate() {
