@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta name="google-site-verification" content="Q3LnD16bcmpmIpjaOD6c4TFTx2gGMjw0h7EoS-69vN8" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group Meal Tracker - E.C Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary-orange: #e67e22;
@@ -22,6 +25,7 @@
         .container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
         h2 { color: var(--primary-orange); text-align: center; margin-top: 0; }
         
+        .group-setup { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #2196f3; }
         .member-setup { background: #fff3e0; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed var(--primary-orange); }
         .member-list-input { display: flex; gap: 10px; margin-bottom: 10px; }
         
@@ -35,6 +39,7 @@
 
         .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-add { background: var(--primary-orange); color: white; width: 80px; margin: 0; }
+        .btn-join { background: #2196f3; color: white; width: 80px; margin: 0; }
         .btn-save { background: var(--secondary-green); color: white; font-size: 18px; }
         .btn-qr { background: #2c3e50; color: white; margin-top: 15px; }
         .btn-export { background: #3498db; color: white; }
@@ -49,28 +54,23 @@
         .summary-box { background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid var(--secondary-green); }
         .summary-item { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
 
-        /* MODERN NOTIFICATION & QR CSS */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
             display: none; align-items: center; justify-content: center; z-index: 9999;
-            animation: fadeIn 0.3s ease;
         }
         .modal-content {
-            background: white; width: 90%; max-width: 380px; padding: 25px;
-            border-radius: 20px; box-shadow: var(--modal-shadow); text-align: center;
-            transform: scale(0.8); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            background: white; width: 90%; max-width: 400px; padding: 30px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center;
         }
-        .modal-head { font-weight: 800; font-size: 1.1rem; color: var(--primary-orange); margin-bottom: 10px; }
-        .modal-body { color: #555; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
+        .modal-head { font-weight: 800; font-size: 1.2rem; color: var(--text-color); margin-bottom: 15px; }
+        .modal-body { color: #666; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
         .modal-footer { display: flex; gap: 10px; }
         .m-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .m-confirm { background: var(--primary-orange); color: white; }
+        .m-confirm { background: #2196f3; color: white; }
         .m-cancel { background: #f1f1f1; color: #777; }
+        .modal-input-field { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 16px; }
         #qrcode { display: flex; justify-content: center; margin-bottom: 20px; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { to { transform: scale(1); } }
 
         footer { margin-top: 40px; padding: 20px; text-align: center; font-size: 14px; color: #7f8c8d; }
     </style>
@@ -78,7 +78,16 @@
 <body>
 
     <div class="container">
-        <h2>Non-Cafe System <br> Ethiopian university Students</h2>
+        <h2>Non-Cafe System <br> Ethiopian University Students</h2>
+
+        <div class="group-setup">
+            <label>Group Name (Private/Normal):</label>
+            <div class="member-list-input">
+                <input type="text" id="groupInput" placeholder="Enter group ID">
+                <button class="btn btn-join" onclick="switchGroup()">Join</button>
+            </div>
+            <small id="currentGroupDisplay" style="color: #2196f3; font-weight: bold;"></small>
+        </div>
 
         <div class="member-setup">
             <label>Add Group Members:</label>
@@ -91,7 +100,7 @@
 
         <div class="input-group">
             <label>Location</label>
-            <input type="text" id="location" placeholder="e.g. Central, Amazon">
+            <input type="text" id="location" placeholder="e.g. Central, Amazon, wude">
         </div>
 
         <div class="input-group" style="display: flex; gap: 10px;">
@@ -99,7 +108,7 @@
                 <label>Meal Type</label>
                 <select id="mealType">
                     <option value="Breakfast">Breakfast</option>
-                    <option value="Launch">Launch</option>
+                    <option value="Lunch">Lunch</option>
                     <option value="Dinner">Dinner</option>
                 </select>
             </div>
@@ -145,7 +154,8 @@
         <div class="modal-content">
             <div id="modalHead" class="modal-head">Notification</div>
             <div id="modalBody" class="modal-body">Message text here...</div>
-            <div id="qrcode"></div> <div id="modalFooter" class="modal-footer">
+            <div id="modalInputArea"></div> <div id="qrcode"></div> 
+            <div id="modalFooter" class="modal-footer">
                 <button id="modalCancel" class="m-btn m-cancel" onclick="closeModal()">Cancel</button>
                 <button id="modalConfirm" class="m-btn m-confirm">OK</button>
             </div>
@@ -158,203 +168,272 @@
     </footer>
 
     <script>
-        let members = JSON.parse(localStorage.getItem('cafeMembers')) || [];
-        let history = JSON.parse(localStorage.getItem('cafeHistory')) || [];
-        let autoCloseTimer;
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlrxItFnPQj2z59463KYIJMTGF0sQXjDk",
+      authDomain: "non-cafe-system.firebaseapp.com",
+      databaseURL: "https://non-cafe-system-default-rtdb.firebaseio.com",
+      projectId: "non-cafe-system",
+      storageBucket: "non-cafe-system.firebasestorage.app",
+      messagingSenderId: "502111895079",
+      appId: "1:502111895079:web:56e9d756fa83d911611802",
+      measurementId: "G-2JLVY4MBE4"
+    };
 
-        // MODAL LOGIC
-        function showNotification(title, msg, onConfirm = null, isConfirmType = false, isQR = false) {
-            const modal = document.getElementById('modernModal');
-            const confirmBtn = document.getElementById('modalConfirm');
-            const cancelBtn = document.getElementById('modalCancel');
-            const qrContainer = document.getElementById('qrcode');
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let groupID = urlParams.get('group') || "public_normal"; 
+    let groupRef = db.ref('groups/' + groupID);
+
+    document.getElementById('currentGroupDisplay').innerText = "Current Group: " + groupID;
+    document.getElementById('groupInput').value = groupID;
+
+    let members = [];
+    let history = [];
+
+    function showNotification({ title, msg, onConfirm = null, isConfirmType = false, isPassword = false }) {
+        const modal = document.getElementById('modernModal');
+        const confirmBtn = document.getElementById('modalConfirm');
+        const cancelBtn = document.getElementById('modalCancel');
+        const inputArea = document.getElementById('modalInputArea');
+        
+        document.getElementById('qrcode').innerHTML = ""; 
+        document.getElementById('modalHead').innerText = title;
+        document.getElementById('modalBody').innerText = msg;
+        inputArea.innerHTML = isPassword ? '<input type="password" id="modalPassInput" class="modal-input-field" placeholder="Enter password...">' : '';
+        
+        modal.style.display = 'flex';
+        cancelBtn.style.display = (isConfirmType || isPassword) ? 'block' : 'none';
+
+        confirmBtn.onclick = () => {
+            let passVal = isPassword ? document.getElementById('modalPassInput').value : null;
+            closeModal();
+            if (onConfirm) onConfirm(passVal);
+        };
+    }
+
+    function closeModal() { document.getElementById('modernModal').style.display = 'none'; }
+
+    function switchGroup() {
+        const newGroupName = document.getElementById('groupInput').value.trim();
+        if (!newGroupName) return;
+
+        db.ref('groups/' + newGroupName + '/password').once('value', (snapshot) => {
+            const existingPass = snapshot.val();
             
-            qrContainer.innerHTML = ""; // Clear any previous QR code
-            document.getElementById('modalHead').innerText = title;
-            document.getElementById('modalBody').innerText = msg;
-            
-            modal.style.display = 'flex';
-            cancelBtn.style.display = isConfirmType ? 'block' : 'none';
-
-            confirmBtn.onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
-
-            // Auto-close logic
-            clearTimeout(autoCloseTimer);
-            if(!isConfirmType && !isQR) {
-                autoCloseTimer = setTimeout(closeModal, 5000);
+            if (existingPass) {
+                showNotification({
+                    title: "Enter Password",
+                    msg: "This is a private group. Please enter the password to join:",
+                    isPassword: true,
+                    onConfirm: (passInput) => {
+                        if (passInput === existingPass) {
+                            window.location.href = window.location.pathname + '?group=' + newGroupName;
+                        } else {
+                            showNotification({ title: "Access Denied", msg: "Incorrect Password!" });
+                        }
+                    }
+                });
+            } else {
+                showNotification({
+                    title: "New Group Detected",
+                    msg: "Set a password for this new group:",
+                    isPassword: true,
+                    onConfirm: (newPass) => {
+                        if (newPass) {
+                            db.ref('groups/' + newGroupName).set({ password: newPass });
+                            window.location.href = window.location.pathname + '?group=' + newGroupName;
+                        }
+                    }
+                });
             }
-        }
+        });
+    }
 
-        // QR CODE LOGIC
-        function showShareQR() {
-            showNotification("Share with Friends", "Let others scan this to open the Non-Cafe system on their phone.", null, false, true);
-            const qrContainer = document.getElementById('qrcode');
-            
-            // This automatically detects your GitHub URL when the site is live
-            const currentURL = window.location.href;
-            
-            new QRCode(qrContainer, {
-                text: currentURL,
-                width: 200,
-                height: 200,
-                colorDark : "#2c3e50",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-            
-            document.getElementById('modalConfirm').innerText = "Close";
-        }
-
-        function closeModal() {
-            document.getElementById('modernModal').style.display = 'none';
-            document.getElementById('modalConfirm').innerText = "OK"; // Reset button text
-        }
-
-        function getEthiopianDate() {
-            const now = new Date();
-            const ethiopianTimestamp = now.getTime() - (2809 * 24 * 60 * 60 * 1000); 
-            const ecDate = new Date(ethiopianTimestamp);
-            return `${String(ecDate.getDate()).padStart(2,'0')}/${String(ecDate.getMonth()+1).padStart(2,'0')}/${ecDate.getFullYear()} E.C`;
-        }
-
-        function init() { renderMembers(); renderHistory(); }
-
-        function addMember() {
-            const name = document.getElementById('newMemberName').value.trim();
-            if (name && !members.includes(name)) {
-                members.push(name);
-                localStorage.setItem('cafeMembers', JSON.stringify(members));
-                document.getElementById('newMemberName').value = '';
-                renderMembers();
-            }
-        }
-
-        function renderMembers() {
-            const grid = document.getElementById('studentGrid');
-            const badges = document.getElementById('memberBadges');
-            grid.innerHTML = ''; badges.innerHTML = '';
-            members.forEach(name => {
-                const badge = document.createElement('span');
-                badge.style = "display:inline-block; background:#ddd; padding:4px 8px; border-radius:12px; margin:2px; font-size:11px;";
-                badge.innerText = name;
-                badges.appendChild(badge);
-
-                const card = document.createElement('div');
-                card.className = 'student-card';
-                card.innerHTML = `
-                    <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
-                        <input type="checkbox" checked class="member-check" data-name="${name}" onchange="calculate()">
-                        <label style="margin:0; font-size:12px;">${name}</label>
-                    </div>
-                    <div class="cost-val" id="cost-${name}">0.00</div>
-                `;
-                grid.appendChild(card);
-            });
-            calculate();
-        }
-
-        function calculate() {
-            const total = parseFloat(document.getElementById('totalPrice').value) || 0;
-            const checks = document.querySelectorAll('.member-check');
-            let activeCount = 0;
-            checks.forEach(c => { if(c.checked) activeCount++; });
-            const perPerson = activeCount > 0 ? (total / activeCount).toFixed(2) : 0;
-            checks.forEach(c => {
-                const name = c.getAttribute('data-name');
-                document.getElementById(`cost-${name}`).innerText = c.checked ? perPerson : "0.00";
-            });
-        }
-
-        function saveToHistory() {
-            const loc = document.getElementById('location').value;
-            const price = parseFloat(document.getElementById('totalPrice').value);
-            
-            if(!loc || !price) {
-                showNotification("Missing Info", "Please provide a location and a total price.");
-                return;
-            }
-
-            const meal = document.getElementById('mealType').value;
-            const checks = document.querySelectorAll('.member-check');
-            const active = Array.from(checks).filter(c => c.checked);
-            
-            if(active.length === 0) {
-                showNotification("Wait!", "At least one member must be selected.");
-                return;
-            }
-
-            const perPerson = (price / active.length).toFixed(2);
-            let splitText = [];
-            let detailData = {};
-            active.forEach(c => {
-                const name = c.getAttribute('data-name');
-                splitText.push(`${name}(${perPerson})`);
-                detailData[name] = parseFloat(perPerson);
-            });
-
-            history.unshift({
-                date: getEthiopianDate(),
-                location: loc,
-                meal: meal,
-                total: price,
-                details: splitText.join(', '),
-                individualCosts: detailData
-            });
-
-            localStorage.setItem('cafeHistory', JSON.stringify(history));
+    groupRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            members = data.members || [];
+            history = data.history ? Object.values(data.history).reverse() : [];
+            renderMembers();
             renderHistory();
-            document.getElementById('location').value = '';
-            document.getElementById('totalPrice').value = '';
-            showNotification("Success!", "Record saved. (Closes in 5s)");
+        } else {
+            members = [];
+            history = [];
+            renderMembers();
+            renderHistory();
+        }
+    });
+
+    function showShareQR() {
+        showNotification({ title: "Share Group", msg: "Scan to join '" + groupID + "'." });
+        new QRCode(document.getElementById('qrcode'), {
+            text: window.location.href,
+            width: 180, height: 180
+        });
+    }
+
+    function getEthiopianDate() {
+        const now = new Date();
+        const ethiopianTimestamp = now.getTime() - (2809 * 24 * 60 * 60 * 1000); 
+        const ecDate = new Date(ethiopianTimestamp);
+        return `${String(ecDate.getDate()).padStart(2,'0')}/${String(ecDate.getMonth()+1).padStart(2,'0')}/${ecDate.getFullYear()} E.C`;
+    }
+
+    function addMember() {
+        const name = document.getElementById('newMemberName').value.trim();
+        if (name && !members.includes(name)) {
+            members.push(name);
+            groupRef.update({ members: members });
+            document.getElementById('newMemberName').value = '';
+        }
+    }
+
+    function renderMembers() {
+        const grid = document.getElementById('studentGrid');
+        const badges = document.getElementById('memberBadges');
+        grid.innerHTML = ''; badges.innerHTML = '';
+        members.forEach(name => {
+            const badge = document.createElement('span');
+            badge.style = "display:inline-block; background:#ddd; padding:4px 8px; border-radius:12px; margin:2px; font-size:11px;";
+            badge.innerText = name;
+            badges.appendChild(badge);
+            const card = document.createElement('div');
+            card.className = 'student-card';
+            card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:5px;"><input type="checkbox" checked class="member-check" data-name="${name}" onchange="calculate()"><label style="margin:0; font-size:12px;">${name}</label></div><div class="cost-val" id="cost-${name}">0.00</div>`;
+            grid.appendChild(card);
+        });
+        calculate();
+    }
+
+    function calculate() {
+        const total = parseFloat(document.getElementById('totalPrice').value) || 0;
+        const checks = document.querySelectorAll('.member-check');
+        let activeCount = 0;
+        checks.forEach(c => { if(c.checked) activeCount++; });
+        const perPerson = activeCount > 0 ? (total / activeCount).toFixed(2) : 0;
+        checks.forEach(c => {
+            const name = c.getAttribute('data-name');
+            const costEl = document.getElementById(`cost-${name}`);
+            if(costEl) costEl.innerText = c.checked ? perPerson : "0.00";
+        });
+    }
+
+    function saveToHistory() {
+        const loc = document.getElementById('location').value;
+        const price = parseFloat(document.getElementById('totalPrice').value);
+        const checks = document.querySelectorAll('.member-check');
+        const active = Array.from(checks).filter(c => c.checked);
+        
+        if(!loc || !price || active.length === 0) {
+            showNotification({ title: "Error", msg: "Check location, price, and selected members." });
+            return;
         }
 
-        function renderHistory() {
-            const tbody = document.querySelector('#historyTable tbody');
-            tbody.innerHTML = '';
-            let totals = {};
-            members.forEach(m => totals[m] = 0);
+        const perPerson = (price / active.length).toFixed(2);
+        let detailText = [];
+        let detailData = {};
+        
+        active.forEach(c => {
+            const name = c.getAttribute('data-name');
+            detailText.push(`${name}(${perPerson})`);
+            detailData[name] = parseFloat(perPerson);
+        });
 
-            history.forEach(item => {
-                tbody.innerHTML += `<tr>
-                    <td>${item.date}</td>
-                    <td>${item.location}</td>
-                    <td>${item.meal}</td>
-                    <td>${item.total}</td>
-                    <td style="color:#2980b9;">${item.details}</td>
-                </tr>`;
-                for (let name in item.individualCosts) {
-                    if (totals.hasOwnProperty(name)) totals[name] += item.individualCosts[name];
-                }
-            });
+        const record = {
+            date: getEthiopianDate(),
+            location: loc,
+            meal: document.getElementById('mealType').value,
+            total: price,
+            details: detailText.join(', '),
+            individualCosts: detailData
+        };
 
-            const sumContent = document.getElementById('summaryContent');
-            sumContent.innerHTML = '';
-            for (let name in totals) {
-                sumContent.innerHTML += `<div class="summary-item"><span>${name}:</span> <span>${totals[name].toFixed(2)} ETB</span></div>`;
+        groupRef.child('history').push(record);
+        document.getElementById('location').value = '';
+        document.getElementById('totalPrice').value = '';
+        
+        calculate(); 
+        
+        showNotification({ title: "Success", msg: "Record saved to " + groupID });
+    }
+
+    function renderHistory() {
+        const tbody = document.querySelector('#historyTable tbody');
+        tbody.innerHTML = '';
+        let totals = {};
+        members.forEach(m => totals[m] = 0);
+        history.forEach(item => {
+            tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.location}</td><td>${item.meal}</td><td>${item.total}</td><td style="color:#2980b9;">${item.details}</td></tr>`;
+            for (let name in item.individualCosts) {
+                if (totals.hasOwnProperty(name)) totals[name] += item.individualCosts[name];
             }
+        });
+        const sumContent = document.getElementById('summaryContent');
+        sumContent.innerHTML = '';
+        for (let name in totals) {
+            sumContent.innerHTML += `<div class="summary-item"><span>${name}:</span> <span>${totals[name].toFixed(2)} ETB</span></div>`;
         }
+    }
 
-        function exportToExcel() {
-            if(history.length === 0) {
-                showNotification("Export Failed", "No history available to export yet.");
-                return;
+    function exportToExcel() {
+        const excelData = history.map(item => {
+            const base = {
+                date: item.date,
+                location: item.location,
+                meal: item.meal,
+                total: item.total
+            };
+            return Object.assign(base, item.individualCosts);
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Meal History");
+        XLSX.writeFile(workbook, "Meal_History_" + groupID + ".xlsx");
+    }
+
+    function clearAllData() {
+        groupRef.child('password').once('value', (snapshot) => {
+            const adminPass = snapshot.val();
+            
+            if (!adminPass || groupID === "public_normal") {
+                showNotification({
+                    title: "Final Check",
+                    msg: "Are you sure? This will delete all history for this public group.",
+                    isConfirmType: true,
+                    onConfirm: () => {
+                        groupRef.child('history').remove();
+                        groupRef.child('members').remove();
+                        location.reload();
+                    }
+                });
+            } else {
+                showNotification({
+                    title: "Confirm Deletion",
+                    msg: "Enter password to clear all group data (History & Members):",
+                    isPassword: true,
+                    onConfirm: (passInput) => {
+                        if (passInput === adminPass) {
+                            showNotification({
+                                title: "Final Check",
+                                msg: "Are you sure? This cannot be undone.",
+                                isConfirmType: true,
+                                onConfirm: () => {
+                                    groupRef.child('history').remove();
+                                    groupRef.child('members').remove();
+                                    location.reload();
+                                }
+                            });
+                        } else {
+                            showNotification({ title: "Denied", msg: "Incorrect password. Data kept safe." });
+                        }
+                    }
+                });
             }
-            const worksheet = XLSX.utils.json_to_sheet(history.map(item => ({
-                Date: item.date, Location: item.location, Meal: item.meal, Total: item.total, Splits: item.details
-            })));
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Meal History");
-            XLSX.writeFile(workbook, "Non_Cafe_History.xlsx");
-        }
-
-        function clearAllData() {
-            showNotification("Delete Data?", "Are you sure you want to clear all history and members?", () => {
-                localStorage.clear();
-                location.reload();
-            }, true);
-        }
-
-        init();
+        });
+    }
     </script>
 </body>
 </html>
