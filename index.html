@@ -3,7 +3,7 @@
 <head>
     <meta name="google-site-verification" content="Q3LnD16bcmpmIpjaOD6c4TFTx2gGMjw0h7EoS-69vN8" />
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
 
     <title>Group Meal Tracker - E.C Edition</title>
@@ -205,11 +205,6 @@
     let history = [];
     let rawHistoryKeys = [];
 
-    function truncateDec(num) {
-        return Math.trunc(num * 10) / 10;
-    }
-
-    // SMART MEAL SELECTOR (Ethiopian Time Shifts)
     function setSmartMealDefault() {
         const hour = new Date().getHours(); 
         const mealSelect = document.getElementById('mealType');
@@ -340,16 +335,24 @@
         calculate();
     }
 
+    // FIX: Rounds UP to 2 decimal places (e.g. 90.333 -> 90.34)
+    function roundUp(num) {
+        return Math.ceil(num * 100) / 100;
+    }
+
     function calculate() {
         const total = parseFloat(document.getElementById('totalPrice').value) || 0;
         const checks = document.querySelectorAll('.member-check');
         let activeCount = 0;
         checks.forEach(c => { if(c.checked) activeCount++; });
-        const perPerson = activeCount > 0 ? truncateDec(total / activeCount) : 0;
+        
+        const perPerson = activeCount > 0 ? (total / activeCount) : 0;
+        const roundedPerPerson = roundUp(perPerson);
+        
         checks.forEach(c => {
             const name = c.getAttribute('data-name');
             const costEl = document.getElementById(`cost-${name}`);
-            if(costEl) costEl.innerText = c.checked ? perPerson.toFixed(1) : "0.0";
+            if(costEl) costEl.innerText = c.checked ? roundedPerPerson.toFixed(2) : "0.00";
         });
     }
 
@@ -364,13 +367,13 @@
             return;
         }
 
-        const perPerson = truncateDec(price / active.length);
+        const perPerson = roundUp(price / active.length);
         let detailText = [];
         let detailData = {};
         
         active.forEach(c => {
             const name = c.getAttribute('data-name');
-            detailText.push(`${name}(${perPerson.toFixed(1)})`);
+            detailText.push(`${name}(${perPerson.toFixed(2)})`);
             detailData[name] = perPerson;
         });
 
@@ -409,7 +412,7 @@
                 <td>${item.date}</td>
                 <td>${item.location}</td>
                 <td>${item.meal}</td>
-                <td>${item.total}</td>
+                <td>${item.total.toFixed(2)}</td>
                 <td style="color:#2980b9;">${item.details}</td>
                 <td><button class="btn-delete-row" onclick="deleteSingleEntry('${rowKey}')">&#128465;</button></td>
             `;
@@ -439,12 +442,12 @@
                 <div class="location-header"><span>${loc}</span> <small>Details</small></div>`;
             for (let person in locationGroups[loc].students) {
                 locHTML += `<div class="summary-item" style="font-weight:normal; font-size:13px;">
-                    <span>${person}:</span> <span>${locationGroups[loc].students[person].toFixed(1)} ETB</span>
+                    <span>${person}:</span> <span>${locationGroups[loc].students[person].toFixed(2)} ETB</span>
                 </div>`;
             }
             locHTML += `<div class="location-footer">
                 <div class="summary-item">
-                    <span>Total (this place):</span> <span>${locationGroups[loc].locTotal.toFixed(1)} ETB</span>
+                    <span>Total (this place):</span> <span>${locationGroups[loc].locTotal.toFixed(2)} ETB</span>
                 </div>
             </div>`;
             locHTML += `</div>`;
@@ -455,7 +458,7 @@
         let payBoxHTML = `<div class="total-pay-box">`;
         for (let name in studentGrandTotals) {
             payBoxHTML += `<div class="summary-item">
-                <span>${name}:</span> <span>${studentGrandTotals[name].toFixed(1)} ETB</span>
+                <span>${name}:</span> <span>${studentGrandTotals[name].toFixed(2)} ETB</span>
             </div>`;
         }
         payBoxHTML += `</div>`;
@@ -464,7 +467,7 @@
         sumContent.innerHTML += `
             <div class="grand-total-box">
                 <div style="font-size:12px; opacity:0.8;">ALL STUDENTS TOTAL EXPENDITURE</div>
-                <div style="font-size:22px; font-weight:bold;">${absoluteTotal.toFixed(1)} ETB</div>
+                <div style="font-size:22px; font-weight:bold;">${absoluteTotal.toFixed(2)} ETB</div>
             </div>`;
     }
 
@@ -505,7 +508,6 @@
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Meal History");
 
-        // Generate Excel File
         const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
 
         function s2ab(s) {
@@ -518,7 +520,6 @@
         const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
         const fileName = "Meal_History_" + groupID + ".xlsx";
 
-        // Mobile-Friendly Download Logic
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(blob, fileName);
         } else {
@@ -529,8 +530,6 @@
             a.href = url;
             a.download = fileName;
             a.click();
-            
-            // Cleanup
             setTimeout(() => {
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
@@ -542,7 +541,6 @@
         alert("Download failed: " + e.message);
     }
 }
-
 
     function clearAllData() {
         groupRef.child('password').once('value', (snapshot) => {
