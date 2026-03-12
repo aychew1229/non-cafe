@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
+
     <title>Group Meal Tracker - E.C Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -55,6 +56,13 @@
         .summary-box { background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid var(--secondary-green); }
         .summary-item { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
 
+        .location-group { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 15px; border-left: 5px solid var(--primary-orange); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .location-header { font-size: 14px; font-weight: 800; color: var(--text-color); border-bottom: 1px solid #eee; margin-bottom: 8px; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .location-footer { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd; color: var(--secondary-green); font-size: 14px; }
+        
+        .total-pay-box { background: #fff; border-radius: 10px; padding: 12px; margin-top: 20px; border-left: 5px solid #2196f3; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .grand-total-box { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; }
+
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
@@ -72,6 +80,8 @@
         .m-cancel { background: #f1f1f1; color: #777; }
         .modal-input-field { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 16px; }
         #qrcode { display: flex; justify-content: center; margin-bottom: 20px; }
+
+        .btn-delete-row { background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px; }
 
         footer { margin-top: 40px; padding: 20px; text-align: center; font-size: 14px; color: #7f8c8d; }
     </style>
@@ -121,11 +131,11 @@
 
         <div class="student-grid" id="studentGrid"></div>
         <button class="btn btn-save" onclick="saveToHistory()">Save Daily Record</button>
-        <button class="btn btn-qr" onclick="showShareQR()">📲 Share App via QR Code</button>
+        <button class="btn btn-qr" onclick="showShareQR()">&#128242; Share App via QR Code</button>
     </div>
 
     <div class="history-section">
-        <button class="btn btn-export" onclick="exportToExcel()">📥 Export History as Excel File</button>
+        <button class="btn btn-export" onclick="exportToExcel()">&#128229; Export History as Excel File</button>
         
         <h3>Saved History</h3>
         <div class="table-wrapper">
@@ -137,6 +147,7 @@
                         <th>Meal</th>
                         <th>Total</th>
                         <th>Split Details</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -144,7 +155,7 @@
         </div>
 
         <div class="summary-box" id="summaryBox">
-            <h4 style="margin-top:0;">Monthly Summary (Total to Pay)</h4>
+            <h4 style="margin-top:0; border-bottom: 2px solid var(--secondary-green); padding-bottom: 5px;">Detailed Monthly Summary</h4>
             <div id="summaryContent"></div>
         </div>
         
@@ -192,6 +203,26 @@
 
     let members = [];
     let history = [];
+    let rawHistoryKeys = [];
+
+    function truncateDec(num) {
+        return Math.trunc(num * 10) / 10;
+    }
+
+    // SMART MEAL SELECTOR (Ethiopian Time Shifts)
+    function setSmartMealDefault() {
+        const hour = new Date().getHours(); 
+        const mealSelect = document.getElementById('mealType');
+
+        if (hour >= 7 && hour < 12) {
+            mealSelect.value = "Breakfast";
+        } else if (hour >= 12 && hour < 18) {
+            mealSelect.value = "Lunch";
+        } else {
+            mealSelect.value = "Dinner";
+        }
+    }
+    setSmartMealDefault();
 
     function showNotification({ title, msg, onConfirm = null, isConfirmType = false, isPassword = false }) {
         const modal = document.getElementById('modernModal');
@@ -256,14 +287,15 @@
         const data = snapshot.val();
         if (data) {
             members = data.members || [];
-            history = data.history ? Object.values(data.history).reverse() : [];
+            const historyObj = data.history || {};
+            rawHistoryKeys = Object.keys(historyObj).reverse();
+            history = rawHistoryKeys.map(k => historyObj[k]);
+            
             renderMembers();
             renderHistory();
         } else {
-            members = [];
-            history = [];
-            renderMembers();
-            renderHistory();
+            members = []; history = []; rawHistoryKeys = [];
+            renderMembers(); renderHistory();
         }
     });
 
@@ -302,7 +334,7 @@
             badges.appendChild(badge);
             const card = document.createElement('div');
             card.className = 'student-card';
-            card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:5px;"><input type="checkbox" checked class="member-check" data-name="${name}" onchange="calculate()"><label style="margin:0; font-size:12px;">${name}</label></div><div class="cost-val" id="cost-${name}">0.00</div>`;
+            card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:5px;"><input type="checkbox" checked class="member-check" data-name="${name}" onchange="calculate()"><label style="margin:0; font-size:12px;">${name}</label></div><div class="cost-val" id="cost-${name}">0.0</div>`;
             grid.appendChild(card);
         });
         calculate();
@@ -313,11 +345,11 @@
         const checks = document.querySelectorAll('.member-check');
         let activeCount = 0;
         checks.forEach(c => { if(c.checked) activeCount++; });
-        const perPerson = activeCount > 0 ? (total / activeCount).toFixed(2) : 0;
+        const perPerson = activeCount > 0 ? truncateDec(total / activeCount) : 0;
         checks.forEach(c => {
             const name = c.getAttribute('data-name');
             const costEl = document.getElementById(`cost-${name}`);
-            if(costEl) costEl.innerText = c.checked ? perPerson : "0.00";
+            if(costEl) costEl.innerText = c.checked ? perPerson.toFixed(1) : "0.0";
         });
     }
 
@@ -332,14 +364,14 @@
             return;
         }
 
-        const perPerson = (price / active.length).toFixed(2);
+        const perPerson = truncateDec(price / active.length);
         let detailText = [];
         let detailData = {};
         
         active.forEach(c => {
             const name = c.getAttribute('data-name');
-            detailText.push(`${name}(${perPerson})`);
-            detailData[name] = parseFloat(perPerson);
+            detailText.push(`${name}(${perPerson.toFixed(1)})`);
+            detailData[name] = perPerson;
         });
 
         const record = {
@@ -356,29 +388,109 @@
         document.getElementById('totalPrice').value = '';
         
         calculate(); 
-        
+        setSmartMealDefault();
         showNotification({ title: "Success", msg: "Record saved to " + groupID });
     }
 
     function renderHistory() {
         const tbody = document.querySelector('#historyTable tbody');
         tbody.innerHTML = '';
-        let totals = {};
-        members.forEach(m => totals[m] = 0);
-        history.forEach(item => {
-            tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.location}</td><td>${item.meal}</td><td>${item.total}</td><td style="color:#2980b9;">${item.details}</td></tr>`;
+        
+        let locationGroups = {}; 
+        let studentGrandTotals = {}; 
+        let absoluteTotal = 0;
+
+        members.forEach(m => studentGrandTotals[m] = 0);
+
+        history.forEach((item, index) => {
+            const rowKey = rawHistoryKeys[index];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.date}</td>
+                <td>${item.location}</td>
+                <td>${item.meal}</td>
+                <td>${item.total}</td>
+                <td style="color:#2980b9;">${item.details}</td>
+                <td><button class="btn-delete-row" onclick="deleteSingleEntry('${rowKey}')">&#128465;</button></td>
+            `;
+            tbody.appendChild(row);
+            
+            absoluteTotal += (item.total || 0);
+
+            const locKey = item.location.trim() || "Unknown";
+            if(!locationGroups[locKey]) locationGroups[locKey] = { students: {}, locTotal: 0 };
+
             for (let name in item.individualCosts) {
-                if (totals.hasOwnProperty(name)) totals[name] += item.individualCosts[name];
+                const cost = item.individualCosts[name];
+                locationGroups[locKey].students[name] = (locationGroups[locKey].students[name] || 0) + cost;
+                locationGroups[locKey].locTotal += cost;
+                if (studentGrandTotals.hasOwnProperty(name)) {
+                    studentGrandTotals[name] += cost;
+                }
             }
         });
+
         const sumContent = document.getElementById('summaryContent');
         sumContent.innerHTML = '';
-        for (let name in totals) {
-            sumContent.innerHTML += `<div class="summary-item"><span>${name}:</span> <span>${totals[name].toFixed(2)} ETB</span></div>`;
+
+        sumContent.innerHTML += `<div style="font-weight:bold; color:var(--primary-orange); margin:10px 0 5px 0; font-size:14px;">&#128205; Breakdown by Location</div>`;
+        for (let loc in locationGroups) {
+            let locHTML = `<div class="location-group">
+                <div class="location-header"><span>${loc}</span> <small>Details</small></div>`;
+            for (let person in locationGroups[loc].students) {
+                locHTML += `<div class="summary-item" style="font-weight:normal; font-size:13px;">
+                    <span>${person}:</span> <span>${locationGroups[loc].students[person].toFixed(1)} ETB</span>
+                </div>`;
+            }
+            locHTML += `<div class="location-footer">
+                <div class="summary-item">
+                    <span>Total (this place):</span> <span>${locationGroups[loc].locTotal.toFixed(1)} ETB</span>
+                </div>
+            </div>`;
+            locHTML += `</div>`;
+            sumContent.innerHTML += locHTML;
         }
+
+        sumContent.innerHTML += `<div style="font-weight:bold; color:#2196f3; margin:20px 0 5px 0; font-size:14px;">&#128179; Individual Totals (Grand Total to Pay)</div>`;
+        let payBoxHTML = `<div class="total-pay-box">`;
+        for (let name in studentGrandTotals) {
+            payBoxHTML += `<div class="summary-item">
+                <span>${name}:</span> <span>${studentGrandTotals[name].toFixed(1)} ETB</span>
+            </div>`;
+        }
+        payBoxHTML += `</div>`;
+        sumContent.innerHTML += payBoxHTML;
+
+        sumContent.innerHTML += `
+            <div class="grand-total-box">
+                <div style="font-size:12px; opacity:0.8;">ALL STUDENTS TOTAL EXPENDITURE</div>
+                <div style="font-size:22px; font-weight:bold;">${absoluteTotal.toFixed(1)} ETB</div>
+            </div>`;
+    }
+
+    function deleteSingleEntry(key) {
+        groupRef.child('password').once('value', (snapshot) => {
+            const adminPass = snapshot.val();
+            const performDelete = () => { groupRef.child('history').child(key).remove(); };
+
+            if (!adminPass || groupID === "public_normal") {
+                showNotification({ title: "Delete Entry", msg: "Remove this specific record?", isConfirmType: true, onConfirm: performDelete });
+            } else {
+                showNotification({
+                    title: "Confirm Deletion",
+                    msg: "Enter password to delete this entry:",
+                    isPassword: true,
+                    onConfirm: (passInput) => {
+                        if (passInput === adminPass) { performDelete(); } 
+                        else { showNotification({ title: "Denied", msg: "Incorrect Password!" }); }
+                    }
+                });
+            }
+        });
     }
 
     function exportToExcel() {
+    try {
         const excelData = history.map(item => {
             const base = {
                 date: item.date,
@@ -392,13 +504,49 @@
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Meal History");
-        XLSX.writeFile(workbook, "Meal_History_" + groupID + ".xlsx");
+
+        // Generate Excel File
+        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
+
+        function s2ab(s) {
+            const buf = new ArrayBuffer(s.length);
+            const view = new Uint8Array(buf);
+            for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        const fileName = "Meal_History_" + groupID + ".xlsx";
+
+        // Mobile-Friendly Download Logic
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, fileName);
+        } else {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            document.body.appendChild(a);
+            a.style = "display: none";
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            
+            // Cleanup
+            setTimeout(() => {
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }, 100);
+        }
+        
+        showNotification({ title: "Export Success", msg: "Check your phone's 'Downloads' folder." });
+    } catch (e) {
+        alert("Download failed: " + e.message);
     }
+}
+
 
     function clearAllData() {
         groupRef.child('password').once('value', (snapshot) => {
             const adminPass = snapshot.val();
-            
             if (!adminPass || groupID === "public_normal") {
                 showNotification({
                     title: "Final Check",
