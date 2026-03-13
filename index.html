@@ -1,4 +1,4 @@
-<!DOCTYPE html5>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="google-site-verification" content="Q3LnD16bcmpmIpjaOD6c4TFTx2gGMjw0h7EoS-69vN8" />
@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
 
     <style>
+    
         :root {
             --primary-orange: #e67e22;
             --secondary-green: #27ae60;
@@ -151,7 +152,7 @@
         
         <div id="apkDownloadLink" style="display:none;">
             <p style="margin:0 0 10px 0; color: var(--text-color); font-size: 14px;">Excel download is limited inside the App.</p>
-            <a id="chromeLink" href="#" target="_blank" style="color: #2196f3; font-weight: bold; text-decoration: underline;">
+            <a id="chromeLink" href="https://robel1229.github.io/non-cafe/" target="_blank" style="color: #2196f3; font-weight: bold; text-decoration: underline;">
                 Click here to open in Chrome to Download Excel
             </a>
         </div>
@@ -226,20 +227,21 @@
 
     // PLATFORM DETECTION - Redirect to your specific URL
     function initPlatform() {
+        // Detection for WebView (APK)
         const isAPK = navigator.userAgent.toLowerCase().includes("wv") || window.location.protocol === "file:";
         const browserBtn = document.getElementById('browserExportBtn');
         const apkLinkDiv = document.getElementById('apkDownloadLink');
         const chromeLink = document.getElementById('chromeLink');
 
-        // FORCE YOUR GITHUB URL
+        // Set the redirect link including current group if needed
         chromeLink.href = "https://robel1229.github.io/non-cafe/?group=" + groupID;
 
         if (isAPK) {
-            browserBtn.style.display = 'none';
-            apkLinkDiv.style.display = 'block';
+            browserBtn.style.display = 'none'; // Hide export button in APK
+            apkLinkDiv.style.display = 'block'; // Show Chrome link in APK
         } else {
-            browserBtn.style.display = 'block';
-            apkLinkDiv.style.display = 'none';
+            browserBtn.style.display = 'block'; // Show export button in Browser
+            apkLinkDiv.style.display = 'none';  // Hide Chrome link in Browser
         }
     }
 
