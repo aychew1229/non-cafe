@@ -310,7 +310,7 @@
             const existingPass = snapshot.val();
             if (existingPass) {
                 showNotification({
-                    title: "Enter Password", msg: "Private group. Enter password:", isPassword: true,
+                    title: "Enter Password", msg: "This is Private group. Enter password to join:", isPassword: true,
                     onConfirm: (passInput) => {
                         if (passInput === existingPass) window.location.href = window.location.pathname + '?group=' + newGroupName;
                         else showNotification({ title: "Access Denied", msg: "Incorrect Password!" });
@@ -362,7 +362,7 @@
         const now = new Date();
         const ethiopianTimestamp = now.getTime() - (2809 * 24 * 60 * 60 * 1000); 
         const ecDate = new Date(ethiopianTimestamp);
-        return `${String(ecDate.getDate()).padStart(2,'0')}/${String(ecDate.getMonth()+1).padStart(2,'0')}/${ecDate.getFullYear()} E.C`;
+        return `${String(ecDate.getDate()).padStart(2,'0')}/${String(ecDate.getMonth()+1).padStart(2,'0')}/${ecDate.getFullYear()}`;
     }
 
     function addMember() {
