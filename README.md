@@ -36,8 +36,8 @@ A high-performance, mobile-first web application engineered specifically for Eth
 * **Frontend:** HTML5, CSS3 (Modern Flexbox/Grid), JavaScript (ES6+)
 * **Backend:** Firebase Realtime Database
 * **Libraries:** * `SheetJS (XLSX)`: Complex spreadsheet generation.
-    * `jsPDF & AutoTable`: PDF report engine.
-    * `QRCode.js`: Instant group sharing logic.
+                 * `jsPDF & AutoTable`: PDF report engine.
+                 * `QRCode.js`: Instant group sharing logic.
 * **UI/UX:** Custom modern design with a mobile-first responsive layout.
 
 ---
@@ -47,8 +47,8 @@ A high-performance, mobile-first web application engineered specifically for Eth
 1. **Join/Create a Group:** Enter a unique Group ID. If it's a new group, set a password.
 2. **Setup Members:** Add your roommates or friends to the member list.
 3. **Log a Meal:** * Enter the location (e.g., "Wude").
-    * Input the total price.
-    * Tick the names of those who shared the meal.
+                   * Input the total price.
+                   * Tick the names of those who shared the meal.
 4. **Save:** Click "Save Daily Record" to sync with the cloud.
 5. **Settle Up:** At the end of the month, use the "Individual Totals" section to see who owes what.
 
