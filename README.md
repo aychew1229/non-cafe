@@ -36,8 +36,8 @@ A high-performance, mobile-first web application engineered specifically for Eth
 * **Frontend:** HTML5, CSS3 (Modern Flexbox/Grid), JavaScript (ES6+)
 * **Backend:** Firebase Realtime Database
 * **Libraries:**
-* * `SheetJS (XLSX)`: Complex spreadsheet generation.
-* * `jsPDF & AutoTable`: PDF report engine.
+  * `SheetJS (XLSX)`: Complex spreadsheet generation.
+  * `jsPDF & AutoTable`: PDF report engine.
   * `QRCode.js`: Instant group sharing logic.
 * **UI/UX:** Custom modern design with a mobile-first responsive layout.
 
@@ -50,7 +50,7 @@ A high-performance, mobile-first web application engineered specifically for Eth
 3. **Log a Meal:**
    * Enter the location (e.g., "Wude").
    * Input the total price.
-   * * Tick the names of those who shared the meal.
+   * Tick the names of those who shared the meal.
 5. **Save:** Click "Save Daily Record" to sync with the cloud.
 6. **Settle Up:** At the end of the month, use the "Individual Totals" section to see who owes what.
 
