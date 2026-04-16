@@ -254,15 +254,30 @@
         .student-card .s-check { display: none; }
 
         /* ── SECTION DIVIDER ── */
-        .section-title {
-            font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-            text-transform: uppercase; color: var(--text-muted);
-            display: flex; align-items: center; gap: 10px;
-            margin: 24px 0 14px;
-            text-align: center;
-            
-        }
-        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-title {
+    font-size: 11px; 
+    font-weight: 700; 
+    letter-spacing: 0.12em;
+    text-transform: uppercase; 
+    color: var(--text-muted);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    gap: 15px;
+    margin: 24px 0 14px;
+}
+.section-title::before { 
+    content: ''; 
+    flex: 1; 
+    height: 1px; 
+    background: var(--border); 
+}
+.section-title::after { 
+    content: ''; 
+    flex: 1; 
+    height: 1px; 
+    background: var(--border); 
+}
 
         /* ── ACTION BUTTONS ROW ── */
         .actions-grid {
