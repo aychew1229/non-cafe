@@ -5,295 +5,692 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-
-    <title>Group Meal Tracker - E.C Edition</title>
+    <title>Non-Cafe — Ethiopian Students</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
-
     <style>
         :root {
-            --primary-orange: #e67e22;
-            --secondary-green: #27ae60;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #2c3e50;
-            --modal-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            --accent: #f97316;
+            --accent-dim: #fb923c;
+            --accent-glow: rgba(249, 115, 22, 0.25);
+            --green: #22c55e;
+            --green-dim: rgba(34, 197, 94, 0.15);
+            --blue: #3b82f6;
+            --red: #ef4444;
+            --bg: #0a0a0f;
+            --bg2: #111118;
+            --bg3: #18181f;
+            --border: rgba(255,255,255,0.07);
+            --border-accent: rgba(249,115,22,0.35);
+            --text: #f1f1f1;
+            --text-muted: #6b6b80;
+            --text-dim: #9999aa;
+            --card: #13131a;
+            --card2: #1a1a24;
+            --radius: 16px;
+            --radius-sm: 10px;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
-        h2 { color: var(--primary-orange); text-align: center; margin-top: 0; }
-        h3 {text-align: center; margin-bottom : 0; }
-        
-        .group-setup { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #2196f3; }
-        .member-setup { background: #fff3e0; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed var(--primary-orange); }
-        .member-list-input { display: flex; gap: 10px; margin-bottom: 10px; }
-        
-        .input-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .student-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 20px 0; }
-        .student-card { background: #f9f9f9; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
-        .cost-val { font-weight: bold; color: var(--secondary-green); font-size: 18px; }
-
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-add { background: var(--primary-orange); color: white; width: 80px; margin: 0; }
-        .btn-join { background: #2196f3; color: white; width: 80px; margin: 0; }
-        .btn-save { background: var(--secondary-green); color: white; font-size: 18px; }
-        .btn-qr { background: #2c3e50; color: white; margin-top: 15px; }
-        .btn-export { background: #3498db; color: white; }
-        .btn-pdf { background: #e74c3c; color: white; margin-top: 10px; }
-        .btn-clear { background: #e74c3c; color: white; margin-top: 20px; padding: 8px 15px; width: auto; }
-        
-        .history-section { width: 100%; max-width: 600px; margin-top: 30px; }
-        .table-wrapper { 
-            overflow-x: auto; 
-            background: white; 
-            border-radius: 10px; 
-            max-height: 400px; 
-            overflow-y: auto; 
-            border: 1px solid #eee;
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th { 
-            background: var(--primary-orange); 
-            color: white; 
-            padding: 10px; 
-            font-size: 12px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
+
+        /* Background mesh */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px; left: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
         }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -200px; right: -200px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
 
-        .summary-box { background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid var(--secondary-green); }
-        .summary-item { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
+        .app-wrap {
+            position: relative; z-index: 1;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px 16px 60px;
+        }
 
-        .location-group { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 15px; border-left: 5px solid var(--primary-orange); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .location-header { font-size: 14px; font-weight: 800; color: var(--text-color); border-bottom: 1px solid #eee; margin-bottom: 8px; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .location-footer { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd; color: var(--secondary-green); font-size: 14px; }
-        
-        .total-pay-box { background: #fff; border-radius: 10px; padding: 12px; margin-top: 20px; border-left: 5px solid #2196f3; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .grand-total-box { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; }
+        /* ── HEADER ── */
+        .app-header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+        .app-header .logo-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(249,115,22,0.1);
+            border: 1px solid var(--border-accent);
+            border-radius: 50px;
+            padding: 6px 16px;
+            font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .app-header h1 {
+            font-size: clamp(26px, 6vw, 38px);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-dim) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .app-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 10px;
+            font-weight: 400;
+        }
 
+        /* ── CARDS ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: rgba(255,255,255,0.12); }
+        .card.accent-border { border-color: var(--border-accent); }
+
+        .card-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-label span { font-size: 16px; }
+
+        /* ── INPUTS ── */
+        .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .input-row:last-child { margin-bottom: 0; }
+
+        .field { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .field label { font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.05em; }
+
+        input[type="text"], input[type="number"], input[type="password"], select {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            padding: 11px 14px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+        input::placeholder { color: var(--text-muted); }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 20px;
+            border: none; border-radius: var(--radius-sm);
+            font-family: 'Sora', sans-serif;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(249,115,22,0.3);
+        }
+        .btn-primary:hover { background: #fb923c; box-shadow: 0 6px 24px rgba(249,115,22,0.45); }
+
+        .btn-ghost {
+            background: var(--bg3);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-blue:hover { background: #60a5fa; }
+
+        .btn-green { background: var(--green); color: #000; font-weight: 700; }
+        .btn-green:hover { background: #4ade80; }
+
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-red:hover { background: #f87171; }
+
+        .btn-dark { background: var(--bg3); border: 1px solid var(--border); color: var(--text-dim); }
+        .btn-dark:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+
+        .btn-full { width: 100%; }
+        .btn-sm { padding: 8px 14px; font-size: 12px; }
+
+        /* ── GROUP JOIN BAR ── */
+        .group-bar {
+            background: var(--card);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .group-bar .join-row { display: flex; gap: 8px; }
+        .group-bar .join-row input { flex: 1; }
+        .group-status {
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            background: rgba(249,115,22,0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* ── MEMBER BADGES ── */
+        .member-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .member-badge {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 11px; color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        /* ── STUDENT GRID ── */
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .student-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 10px;
+            text-align: center;
+            transition: border-color 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .student-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .student-card.active { border-color: var(--green); background: rgba(34,197,94,0.05); }
+        .student-card .s-name { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
+        .student-card .s-cost {
+            font-size: 18px; font-weight: 800;
+            color: var(--green);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .student-card .s-cost.zero { color: var(--text-muted); }
+        .student-card .s-check { display: none; }
+
+        /* ── SECTION DIVIDER ── */
+        .section-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--text-muted);
+            display: flex; align-items: center; gap: 10px;
+            margin: 24px 0 14px;
+        }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        /* ── ACTION BUTTONS ROW ── */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        /* ── TABLE ── */
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .table-scroll { overflow-x: auto; max-height: 380px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 480px; }
+        thead th {
+            background: var(--card2);
+            padding: 12px 14px;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: left;
+            position: sticky; top: 0; z-index: 5;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 11px 14px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .td-loc { color: var(--text); font-weight: 600; }
+        .td-meal {
+            display: inline-block;
+            background: rgba(249,115,22,0.1);
+            color: var(--accent);
+            border-radius: 6px; padding: 2px 8px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+        }
+        .td-total { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+        .td-details { color: var(--blue); font-size: 11px; max-width: 140px; }
+        .btn-action {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 16px; padding: 4px 6px;
+            border-radius: 6px; transition: all 0.15s;
+        }
+        .btn-action:hover { background: var(--bg3); color: var(--text); }
+        .btn-action.del:hover { color: var(--red); }
+
+        /* ── SUMMARY ── */
+        .summary-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 14px;
+        }
+        .summary-card h4 {
+            font-size: 12px; font-weight: 700; color: var(--text-muted);
+            letter-spacing: 0.1em; text-transform: uppercase;
+            margin-bottom: 16px; padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .loc-block {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        .loc-block-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+        .loc-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+        .loc-total { border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 8px; color: var(--green); font-weight: 700; font-size: 13px; display: flex; justify-content: space-between; }
+
+        .pay-block {
+            background: var(--bg3);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-left: 3px solid var(--blue);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-top: 14px;
+        }
+        .pay-block-title { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+        .pay-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-dim); padding: 5px 0; border-bottom: 1px solid var(--border); }
+        .pay-row:last-child { border-bottom: none; }
+        .pay-row span:last-child { font-family: 'JetBrains Mono', monospace; color: var(--text); font-weight: 600; }
+
+        .grand-total-block {
+            background: linear-gradient(135deg, var(--accent) 0%, #ea580c 100%);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            margin-top: 14px;
+        }
+        .grand-total-block .gt-label { font-size: 10px; opacity: 0.8; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+        .grand-total-block .gt-amount { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+        .grand-total-block .gt-sub { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+        /* ── MODAL ── */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
-            display: none; align-items: center; justify-content: center; z-index: 10001; /* High Z-Index for popups */
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999; padding: 20px;
         }
-        .modal-content {
-            background: white; width: 90%; max-width: 400px; padding: 25px;
-            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center;
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            width: 100%; max-width: 420px;
             max-height: 90vh; overflow-y: auto;
+            animation: slideUp 0.25s ease;
         }
-        
-        /* Edit Modal specific override */
-        #editModal { z-index: 10000; } 
-
-        .modal-head { font-weight: 800; font-size: 1.2rem; color: var(--text-color); margin-bottom: 15px; }
-        .modal-body { color: #666; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
+        @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: none; } }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .modal-msg { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; }
+        .modal-input { 
+            width: 100%; background: var(--bg3); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text);
+            font-family: 'Sora', sans-serif; font-size: 15px;
+            padding: 13px 16px; margin-bottom: 20px; outline: none;
+            text-align: center;
+        }
+        .modal-input:focus { border-color: var(--accent); }
         .modal-footer { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .m-confirm { background: #2196f3; color: white; }
-        .m-cancel { background: #f1f1f1; color: #777; }
-        .modal-input-field { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 16px; }
+        .modal-footer .btn { flex: 1; padding: 13px; font-size: 14px; }
         #qrcode { display: flex; justify-content: center; margin-bottom: 20px; }
 
-        .btn-action { background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px; }
-        footer { margin-top: 40px; padding: 20px; text-align: center; font-size: 14px; color: #7f8c8d; }
-
-        #apkDownloadLink {
-            background: #fff3e0; padding: 15px; border-radius: 10px; border: 1px solid var(--primary-orange); text-align: center; margin-bottom: 15px;
+        .edit-check-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 12px; border-radius: 8px;
+            transition: background 0.15s;
         }
-        
-        .edit-member-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid #f0f0f0; }
+        .edit-check-row:hover { background: var(--bg3); }
+        .edit-check-row label { font-size: 13px; color: var(--text); }
+        input[type="checkbox"] {
+            width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+        .empty-state p { font-size: 13px; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: var(--card2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px 20px;
+            font-size: 13px; font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            z-index: 99999;
+            transition: transform 0.3s ease;
+            max-width: 320px; text-align: center;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: var(--green); color: var(--green); }
+        .toast.error { border-color: var(--red); color: var(--red); }
+        .toast.info { border-color: var(--accent); color: var(--accent); }
+
+        /* APK warning */
+        .apk-note {
+            background: rgba(249,115,22,0.06);
+            border: 1px dashed var(--border-accent);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-dim);
+            display: none;
+            margin-bottom: 10px;
+        }
+        .apk-note a { color: var(--accent); font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Non-Cafe System <br> Ethiopian University Students</h2>
+<div class="app-wrap">
 
-        <div class="group-setup">
-            <label>Group Name (Private/Normal):</label>
-            <div class="member-list-input">
-                <input type="text" id="groupInput" placeholder="Enter group ID">
-                <button class="btn btn-join" onclick="switchGroup()">Join</button>
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="logo-badge">🍽 Non-Cafe System</div>
+        <h1>Ethiopian University<br>Meal Tracker</h1>
+        <p>Split meals, track expenses, stay organized.</p>
+    </div>
+
+    <!-- GROUP BAR -->
+    <div class="group-bar">
+        <div class="card-label"><span>👥</span> Group Session</div>
+        <div class="join-row">
+            <input type="text" id="groupInput" placeholder="Enter group ID or name">
+            <button class="btn btn-blue" onclick="switchGroup()">Join</button>
+        </div>
+        <span class="group-status" id="currentGroupDisplay">Loading...</span>
+    </div>
+
+    <!-- MEMBERS CARD -->
+    <div class="card">
+        <div class="card-label"><span>🙋</span> Add Members</div>
+        <div class="input-row">
+            <input type="text" id="newMemberName" placeholder="Member name" style="flex:1" onkeydown="if(event.key==='Enter')addMember()">
+            <button class="btn btn-primary" onclick="addMember()">Add</button>
+        </div>
+        <div class="member-badges" id="memberBadges"></div>
+    </div>
+
+    <!-- ENTRY CARD -->
+    <div class="card accent-border">
+        <div class="card-label"><span>📝</span> Log a Meal</div>
+        <div class="input-row">
+            <div class="field">
+                <label>Location</label>
+                <input type="text" id="location" placeholder="e.g. Central, Amazon, Wude">
             </div>
-            <small id="currentGroupDisplay" style="color: #2196f3; font-weight: bold;"></small>
         </div>
-
-        <div class="member-setup">
-            <label>Add Group Members:</label>
-            <div class="member-list-input">
-                <input type="text" id="newMemberName" placeholder="Enter name">
-                <button class="btn btn-add" onclick="addMember()">Add</button>
-            </div>
-            <div id="memberBadges"></div>
-        </div>
-
-        <div class="input-group">
-            <label>Location</label>
-            <input type="text" id="location" placeholder="e.g. Central, Amazon, wude">
-        </div>
-
-        <div class="input-group" style="display: flex; gap: 10px;">
-            <div style="flex: 1;">
+        <div class="input-row">
+            <div class="field">
                 <label>Meal Type</label>
                 <select id="mealType">
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
+                    <option>Breakfast</option>
+                    <option>Lunch</option>
+                    <option>Dinner</option>
                 </select>
             </div>
-            <div style="flex: 1;">
+            <div class="field">
                 <label>Total Price (ETB)</label>
                 <input type="number" id="totalPrice" placeholder="0.00" oninput="calculate()">
             </div>
         </div>
 
         <div class="student-grid" id="studentGrid"></div>
-        <button class="btn btn-save" onclick="saveToHistory()">Save Daily Record</button>
-        <button class="btn btn-qr" onclick="showShareQR()">&#128242; Share App via QR Code</button>
+
+        <button class="btn btn-green btn-full" onclick="saveToHistory()">
+            ✓ Save Daily Record
+        </button>
+        <button class="btn btn-dark btn-full" style="margin-top:8px" onclick="showShareQR()">
+            📱 Share App via QR Code
+        </button>
     </div>
 
-    <div class="history-section">
-        <button id="browserExportBtn" class="btn btn-export" onclick="exportToExcel()" style="display:none;">
-            &#128229; Export History (Excel)
+    <!-- HISTORY SECTION -->
+    <div class="section-title">Saved History</div>
+
+    <div class="actions-grid">
+        <button id="browserExportBtn" class="btn btn-dark" onclick="exportToExcel()">
+            📊 Export Excel
         </button>
-        
-        <button class="btn btn-pdf" onclick="exportToPDF()">
-            &#128196; Download PDF Report
+        <button class="btn btn-dark" onclick="exportToPDF()">
+            📄 Export PDF
         </button>
-        
-        <div id="apkDownloadLink" style="display:none;">
-            <p style="margin:10px 0 10px 0; color: var(--text-color); font-size: 14px;">Excel download is limited inside the App.</p>
-            <a id="chromeLink" href="https://robel1229.github.io/non-cafe/" target="_blank" style="color: #2196f3; font-weight: bold; text-decoration: underline;">
-                Click here to open in Chrome to Download Excel
-            </a>
-        </div>
-        
-        <h3>Saved History</h3>
-        <div class="table-wrapper">
+    </div>
+
+    <div class="apk-note" id="apkDownloadLink">
+        Excel download is limited inside the App. &nbsp;
+        <a id="chromeLink" href="#" target="_blank">Open in Chrome to download →</a>
+    </div>
+
+    <div class="table-card">
+        <div class="table-scroll">
             <table id="historyTable">
                 <thead>
                     <tr>
                         <th>Date (E.C)</th>
-                        <th>Loc</th>
+                        <th>Location</th>
                         <th>Meal</th>
                         <th>Total</th>
-                        <th>Split Details</th>
-                        <th>Action</th>
+                        <th>Split</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
-
-        <div class="summary-box" id="summaryBox">
-            <h4 style="margin-top:0; border-bottom: 2px solid var(--secondary-green); padding-bottom: 5px;">Detailed Monthly Summary</h4>
-            <div id="summaryContent"></div>
-        </div>
-        
-        <button class="btn btn-clear" onclick="clearAllData()">Clear All Data</button>
     </div>
 
-    <div id="modernModal" class="modal-overlay">
-        <div class="modal-content">
-            <div id="modalHead" class="modal-head">Notification</div>
-            <div id="modalBody" class="modal-body">Message text here...</div>
-            <div id="modalInputArea"></div> <div id="qrcode"></div> 
-            <div id="modalFooter" class="modal-footer">
-                <button id="modalCancel" class="m-btn m-cancel" onclick="closeModal()">Cancel</button>
-                <button id="modalConfirm" class="m-btn m-confirm">OK</button>
+    <!-- SUMMARY -->
+    <div class="summary-card" id="summaryBox">
+        <h4>📊 Monthly Summary</h4>
+        <div id="summaryContent">
+            <div class="empty-state">
+                <div class="icon">📋</div>
+                <p>No records yet. Save a meal to see the summary.</p>
             </div>
         </div>
     </div>
 
-    <div id="editModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-head">Edit Meal Record</div>
-            <div class="input-group"><label>Date (E.C)</label><input type="text" id="editDate"></div>
-            <div class="input-group"><label>Location</label><input type="text" id="editLoc"></div>
-            <div class="input-group"><label>Meal</label><select id="editMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option></select></div>
-            <div class="input-group"><label>Total Price</label><input type="number" id="editTotal"></div>
-            <label>Participants:</label>
-            <div id="editMemberChecklist" style="text-align:left; margin-bottom:15px; border:1px solid #eee; padding:10px; border-radius:10px;"></div>
-            <div class="modal-footer">
-                <button class="m-btn m-cancel" onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
-                <button class="m-btn m-confirm" id="saveEditBtn">Update Record</button>
-            </div>
+    <button class="btn btn-red btn-sm" onclick="clearAllData()" style="margin-top:4px">
+        🗑 Clear All Data
+    </button>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MAIN MODAL -->
+<div id="modernModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title" id="modalHead">Notification</div>
+        <div class="modal-msg" id="modalBody"></div>
+        <div id="modalInputArea"></div>
+        <div id="qrcode"></div>
+        <div class="modal-footer">
+            <button id="modalCancel" class="btn btn-dark" onclick="closeModal()">Cancel</button>
+            <button id="modalConfirm" class="btn btn-primary">OK</button>
         </div>
     </div>
+</div>
 
-    <footer>
-        &copy; 2026 Non-Cafe System. Created by Aman. <br>
-        Built for students. Available on GitHub.
-    </footer>
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-overlay" style="z-index:10000">
+    <div class="modal-box">
+        <div class="modal-title">✏️ Edit Meal Record</div>
+        <div class="input-row"><div class="field"><label>Date (E.C)</label><input type="text" id="editDate"></div></div>
+        <div class="input-row"><div class="field"><label>Location</label><input type="text" id="editLoc"></div></div>
+        <div class="input-row">
+            <div class="field"><label>Meal</label>
+                <select id="editMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option></select>
+            </div>
+            <div class="field"><label>Total Price (ETB)</label><input type="number" id="editTotal"></div>
+        </div>
+        <div class="card-label" style="margin:14px 0 8px"><span>👥</span> Participants</div>
+        <div id="editMemberChecklist" style="border:1px solid var(--border); border-radius:10px; padding:6px; margin-bottom:18px;"></div>
+        <div class="modal-footer">
+            <button class="btn btn-dark" onclick="document.getElementById('editModal').classList.remove('show')">Cancel</button>
+            <button class="btn btn-primary" id="saveEditBtn">Update Record</button>
+        </div>
+    </div>
+</div>
 
-    <script>
+<footer>
+    &copy; 2026 Non-Cafe System &mdash; <strong>Built by Aman</strong><br>
+    Made with ❤️ for Ethiopian university students &bull; <a href="https://github.com/robel1229/non-cafe" target="_blank">GitHub</a>
+</footer>
+
+<script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBlrxItFnPQj2z59463KYIJMTGF0sQXjDk",
-      authDomain: "non-cafe-system.firebaseapp.com",
-      databaseURL: "https://non-cafe-system-default-rtdb.firebaseio.com",
-      projectId: "non-cafe-system",
-      storageBucket: "non-cafe-system.firebasestorage.app",
-      messagingSenderId: "502111895079",
-      appId: "1:502111895079:web:56e9d756fa83d911611802",
-      measurementId: "G-2JLVY4MBE4"
+        apiKey: "AIzaSyBlrxItFnPQj2z59463KYIJMTGF0sQXjDk",
+        authDomain: "non-cafe-system.firebaseapp.com",
+        databaseURL: "https://non-cafe-system-default-rtdb.firebaseio.com",
+        projectId: "non-cafe-system",
+        storageBucket: "non-cafe-system.firebasestorage.app",
+        messagingSenderId: "502111895079",
+        appId: "1:502111895079:web:56e9d756fa83d911611802",
+        measurementId: "G-2JLVY4MBE4"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     const urlParams = new URLSearchParams(window.location.search);
-    let groupID = urlParams.get('group') || "public_normal"; 
+    let groupID = urlParams.get('group') || "public_normal";
     let groupRef = db.ref('groups/' + groupID);
 
-    document.getElementById('currentGroupDisplay').innerText = "Current Group: " + groupID;
+    document.getElementById('currentGroupDisplay').innerText = "Group: " + groupID;
     document.getElementById('groupInput').value = groupID;
 
     let members = [];
     let historyEntries = [];
 
+    /* ─── TOAST ─── */
+    let toastTimer;
+    function showToast(msg, type = 'info') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + type;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { t.classList.remove('show'); }, 2800);
+    }
+
+    /* ─── PLATFORM INIT ─── */
     function initPlatform() {
         const isAPK = navigator.userAgent.toLowerCase().includes("wv") || window.location.protocol === "file:";
-        const browserBtn = document.getElementById('browserExportBtn');
-        const apkLinkDiv = document.getElementById('apkDownloadLink');
         const chromeLink = document.getElementById('chromeLink');
         chromeLink.href = "https://robel1229.github.io/non-cafe/?group=" + groupID;
-        if (isAPK) { browserBtn.style.display = 'none'; apkLinkDiv.style.display = 'block'; } 
-        else { browserBtn.style.display = 'block'; apkLinkDiv.style.display = 'none'; }
+        if (isAPK) {
+            document.getElementById('browserExportBtn').style.display = 'none';
+            document.getElementById('apkDownloadLink').style.display = 'block';
+        }
     }
 
     function setSmartMealDefault() {
-        const hour = new Date().getHours(); 
-        const mealSelect = document.getElementById('mealType');
-        if (hour >= 7 && hour < 12) mealSelect.value = "Breakfast";
-        else if (hour >= 12 && hour < 18) mealSelect.value = "Lunch";
-        else mealSelect.value = "Dinner";
+        const hour = new Date().getHours();
+        const s = document.getElementById('mealType');
+        s.value = hour >= 7 && hour < 12 ? "Breakfast" : hour >= 12 && hour < 18 ? "Lunch" : "Dinner";
     }
 
-    window.onload = function() { initPlatform(); setSmartMealDefault(); };
+    window.onload = function () { initPlatform(); setSmartMealDefault(); };
 
+    /* ─── MODAL ─── */
     function showNotification({ title, msg, onConfirm = null, isConfirmType = false, isPassword = false }) {
         const modal = document.getElementById('modernModal');
         const confirmBtn = document.getElementById('modalConfirm');
         const cancelBtn = document.getElementById('modalCancel');
         const inputArea = document.getElementById('modalInputArea');
-        document.getElementById('qrcode').innerHTML = ""; 
+        document.getElementById('qrcode').innerHTML = "";
         document.getElementById('modalHead').innerText = title;
         document.getElementById('modalBody').innerText = msg;
-        inputArea.innerHTML = isPassword ? '<input type="password" id="modalPassInput" class="modal-input-field" placeholder="Enter password...">' : '';
-        modal.style.display = 'flex';
-        cancelBtn.style.display = (isConfirmType || isPassword) ? 'block' : 'none';
+        inputArea.innerHTML = isPassword
+            ? '<input type="password" id="modalPassInput" class="modal-input" placeholder="Enter password...">'
+            : '';
+        modal.classList.add('show');
+        cancelBtn.style.display = (isConfirmType || isPassword) ? '' : 'none';
         confirmBtn.onclick = () => {
             let passVal = isPassword ? document.getElementById('modalPassInput').value : null;
             closeModal();
@@ -301,75 +698,57 @@
         };
     }
 
-    function closeModal() { document.getElementById('modernModal').style.display = 'none'; }
+    function closeModal() { document.getElementById('modernModal').classList.remove('show'); }
 
+    /* ─── GROUP ─── */
     function switchGroup() {
-        const newGroupName = document.getElementById('groupInput').value.trim();
-        if (!newGroupName) return;
-        db.ref('groups/' + newGroupName + '/password').once('value', (snapshot) => {
-            const existingPass = snapshot.val();
+        const newGroup = document.getElementById('groupInput').value.trim();
+        if (!newGroup) return;
+        db.ref('groups/' + newGroup + '/password').once('value', (snap) => {
+            const existingPass = snap.val();
             if (existingPass) {
                 showNotification({
-                    title: "Enter Password", msg: "This is Private group. Enter password to join:", isPassword: true,
-                    onConfirm: (passInput) => {
-                        if (passInput === existingPass) window.location.href = window.location.pathname + '?group=' + newGroupName;
-                        else showNotification({ title: "Access Denied", msg: "Incorrect Password!" });
+                    title: "Private Group", msg: "Enter password to join:", isPassword: true,
+                    onConfirm: (p) => {
+                        if (p === existingPass) window.location.href = window.location.pathname + '?group=' + newGroup;
+                        else showNotification({ title: "Access Denied", msg: "Incorrect password." });
                     }
                 });
             } else {
                 showNotification({
-                    title: "New Group Detected", msg: "Set a password for this new group:", isPassword: true,
-                    onConfirm: (newPass) => {
-                        if (newPass) {
-                            db.ref('groups/' + newGroupName).set({ password: newPass });
-                            window.location.href = window.location.pathname + '?group=' + newGroupName;
-                        }
+                    title: "Join Group", msg: `Join "${newGroup}"? Set a password to make it private (leave blank for public).`, isPassword: true,
+                    isConfirmType: true,
+                    onConfirm: (p) => {
+                        if (p) db.ref('groups/' + newGroup + '/password').set(p);
+                        window.location.href = window.location.pathname + '?group=' + newGroup;
                     }
                 });
             }
         });
     }
 
+    /* ─── FIREBASE LISTENER ─── */
     groupRef.on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
             members = data.members || [];
-            const historyObj = data.history || {};
-            historyEntries = Object.keys(historyObj).map(key => ({
-                id: key,
-                ...historyObj[key]
-            })).sort((a, b) => {
-                const partsA = a.date.split(' ')[0].split('/');
-                const partsB = b.date.split(' ')[0].split('/');
-                const dateA = new Date(partsA[2], partsA[1]-1, partsA[0]);
-                const dateB = new Date(partsB[2], partsB[1]-1, partsB[0]);
-                return dateB - dateA;
-            });
-            renderMembers();
-            renderHistory();
-        } else {
-            members = []; historyEntries = [];
-            renderMembers(); renderHistory();
-        }
+            const histObj = data.history || {};
+            historyEntries = Object.keys(histObj).map(key => ({ id: key, ...histObj[key] }))
+                .sort((a, b) => {
+                    const p = s => s.split(' ')[0].split('/');
+                    const [dA, dB] = [p(a.date), p(b.date)];
+                    return new Date(dB[2], dB[1]-1, dB[0]) - new Date(dA[2], dA[1]-1, dA[0]);
+                });
+        } else { members = []; historyEntries = []; }
+        renderMembers(); renderHistory();
     });
 
-    function showShareQR() {
-        showNotification({ title: "Share Group", msg: "Scan to join '" + groupID + "'." });
-        new QRCode(document.getElementById('qrcode'), { text: window.location.href, width: 180, height: 180 });
-    }
-
-    function getEthiopianDate() {
-        const now = new Date();
-        const ethiopianTimestamp = now.getTime() - (2809 * 24 * 60 * 60 * 1000); 
-        const ecDate = new Date(ethiopianTimestamp);
-        return `${String(ecDate.getDate()).padStart(2,'0')}/${String(ecDate.getMonth()+1).padStart(2,'0')}/${ecDate.getFullYear()}`;
-    }
-
+    /* ─── MEMBERS ─── */
     function addMember() {
         const name = document.getElementById('newMemberName').value.trim();
         if (name && !members.includes(name)) {
             members.push(name);
-            groupRef.update({ members: members });
+            groupRef.update({ members });
             document.getElementById('newMemberName').value = '';
         }
     }
@@ -379,50 +758,78 @@
         const badges = document.getElementById('memberBadges');
         grid.innerHTML = ''; badges.innerHTML = '';
         members.forEach(name => {
-            const badge = document.createElement('span');
-            badge.style = "display:inline-block; background:#ddd; padding:4px 8px; border-radius:12px; margin:2px; font-size:11px;";
-            badge.innerText = name;
-            badges.appendChild(badge);
+            // Badge
+            const b = document.createElement('span');
+            b.className = 'member-badge';
+            b.textContent = name;
+            badges.appendChild(b);
+            // Card
             const card = document.createElement('div');
-            card.className = 'student-card';
-            card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:5px;"><input type="checkbox" checked class="member-check" data-name="${name}" onchange="calculate()"><label style="margin:0; font-size:12px;">${name}</label></div><div class="cost-val" id="cost-${name}">0.0</div>`;
+            card.className = 'student-card active';
+            card.dataset.name = name;
+            card.innerHTML = `
+                <input type="checkbox" class="s-check member-check" checked data-name="${name}" onchange="toggleCard(this);calculate()">
+                <div class="s-name">${name}</div>
+                <div class="s-cost" id="cost-${name}">0.00</div>
+            `;
+            card.onclick = (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const cb = card.querySelector('.member-check');
+                    cb.checked = !cb.checked;
+                    toggleCard(cb); calculate();
+                }
+            };
             grid.appendChild(card);
         });
         calculate();
     }
 
-    function roundUp(num) { return Math.ceil(num * 100) / 100; }
+    function toggleCard(cb) {
+        const card = cb.closest('.student-card');
+        card.classList.toggle('active', cb.checked);
+        const cost = document.getElementById('cost-' + cb.dataset.name);
+        if (!cb.checked && cost) { cost.textContent = '0.00'; cost.className = 's-cost zero'; }
+    }
+
+    /* ─── CALCULATE ─── */
+    function roundUp(n) { return Math.ceil(n * 100) / 100; }
 
     function calculate() {
         const total = parseFloat(document.getElementById('totalPrice').value) || 0;
         const checks = document.querySelectorAll('.member-check');
-        let activeCount = 0;
-        checks.forEach(c => { if(c.checked) activeCount++; });
-        const perPerson = activeCount > 0 ? (total / activeCount) : 0;
-        const roundedPerPerson = roundUp(perPerson);
+        let active = 0;
+        checks.forEach(c => { if (c.checked) active++; });
+        const per = active > 0 ? roundUp(total / active) : 0;
         checks.forEach(c => {
-            const name = c.getAttribute('data-name');
-            const costEl = document.getElementById(`cost-${name}`);
-            if(costEl) costEl.innerText = c.checked ? roundedPerPerson.toFixed(2) : "0.00";
+            const el = document.getElementById('cost-' + c.dataset.name);
+            if (el) {
+                el.textContent = c.checked ? per.toFixed(2) : '0.00';
+                el.className = 's-cost' + (!c.checked ? ' zero' : '');
+            }
         });
     }
 
+    /* ─── ETHIOPIAN DATE ─── */
+    function getEthiopianDate() {
+        const now = new Date();
+        const ec = new Date(now.getTime() - (2809 * 24 * 60 * 60 * 1000));
+        return `${String(ec.getDate()).padStart(2,'0')}/${String(ec.getMonth()+1).padStart(2,'0')}/${ec.getFullYear()}`;
+    }
+
+    /* ─── SAVE ─── */
     function saveToHistory() {
-        const loc = document.getElementById('location').value;
+        const loc = document.getElementById('location').value.trim();
         const price = parseFloat(document.getElementById('totalPrice').value);
         const checks = document.querySelectorAll('.member-check');
         const active = Array.from(checks).filter(c => c.checked);
-        if(!loc || !price || active.length === 0) {
-            showNotification({ title: "Error", msg: "Check location, price, and selected members." });
-            return;
+        if (!loc || !price || active.length === 0) {
+            showToast('Check location, price & members.', 'error'); return;
         }
-        const perPerson = roundUp(price / active.length);
-        let detailText = [];
-        let detailData = {};
+        const per = roundUp(price / active.length);
+        let detailText = [], detailData = {};
         active.forEach(c => {
-            const name = c.getAttribute('data-name');
-            detailText.push(`${name}(${perPerson.toFixed(2)})`);
-            detailData[name] = perPerson;
+            detailText.push(`${c.dataset.name}(${per.toFixed(2)})`);
+            detailData[c.dataset.name] = per;
         });
         const record = {
             date: getEthiopianDate(),
@@ -436,34 +843,36 @@
         document.getElementById('location').value = '';
         document.getElementById('totalPrice').value = '';
         calculate(); setSmartMealDefault();
-        showNotification({ title: "Success", msg: "Record saved to " + groupID });
+        showToast('Record saved to ' + groupID, 'success');
     }
 
+    /* ─── RENDER HISTORY ─── */
     function renderHistory() {
         const tbody = document.querySelector('#historyTable tbody');
         tbody.innerHTML = '';
-        let locationGroups = {}; 
-        let studentGrandTotals = {}; 
-        let absoluteTotal = 0;
+        let locationGroups = {}, studentGrandTotals = {}, absoluteTotal = 0;
         members.forEach(m => studentGrandTotals[m] = 0);
 
-        historyEntries.forEach((item) => {
+        if (historyEntries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">🍽</div><p>No meals saved yet.</p></div></td></tr>';
+        }
+
+        historyEntries.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.date}</td>
-                <td>${item.location}</td>
-                <td>${item.meal}</td>
-                <td>${item.total.toFixed(2)}</td>
-                <td style="color:#2980b9;">${item.details}</td>
+                <td style="font-family:'JetBrains Mono',monospace; font-size:11px">${item.date}</td>
+                <td class="td-loc">${item.location}</td>
+                <td><span class="td-meal">${item.meal}</span></td>
+                <td class="td-total">${item.total.toFixed(2)}</td>
+                <td class="td-details">${item.details}</td>
                 <td>
-                    <button class="btn-action" onclick="openEditModal('${item.id}')">&#9998;</button>
-                    <button class="btn-action" onclick="deleteSingleEntry('${item.id}')">&#128465;</button>
-                </td>
-            `;
+                    <button class="btn-action" title="Edit" onclick="openEditModal('${item.id}')">✏️</button>
+                    <button class="btn-action del" title="Delete" onclick="deleteSingleEntry('${item.id}')">🗑</button>
+                </td>`;
             tbody.appendChild(row);
             absoluteTotal += (item.total || 0);
             const locKey = item.location.trim() || "Unknown";
-            if(!locationGroups[locKey]) locationGroups[locKey] = { students: {}, locTotal: 0 };
+            if (!locationGroups[locKey]) locationGroups[locKey] = { students: {}, locTotal: 0 };
             for (let name in item.individualCosts) {
                 const cost = item.individualCosts[name];
                 locationGroups[locKey].students[name] = (locationGroups[locKey].students[name] || 0) + cost;
@@ -472,66 +881,66 @@
             }
         });
 
-        const sumContent = document.getElementById('summaryContent');
-        sumContent.innerHTML = `<div style="font-weight:bold; color:var(--primary-orange); margin:10px 0 5px 0; font-size:14px;">&#128205; Breakdown by Location</div>`;
+        const sum = document.getElementById('summaryContent');
+        if (historyEntries.length === 0) {
+            sum.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Save a meal to see the summary.</p></div>';
+            return;
+        }
+
+        let html = '<div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">📍 By Location</div>';
         for (let loc in locationGroups) {
-            let locHTML = `<div class="location-group"><div class="location-header"><span>${loc}</span> <small>Details</small></div>`;
-            for (let person in locationGroups[loc].students) {
-                locHTML += `<div class="summary-item" style="font-weight:normal; font-size:13px;"><span>${person}:</span> <span>${locationGroups[loc].students[person].toFixed(2)} ETB</span></div>`;
-            }
-            locHTML += `<div class="location-footer"><div class="summary-item"><span>Total (this place):</span> <span>${locationGroups[loc].locTotal.toFixed(2)} ETB</span></div></div></div>`;
-            sumContent.innerHTML += locHTML;
+            html += `<div class="loc-block"><div class="loc-block-name">${loc}</div>`;
+            for (let p in locationGroups[loc].students)
+                html += `<div class="loc-row"><span>${p}</span><span style="font-family:'JetBrains Mono',monospace">${locationGroups[loc].students[p].toFixed(2)} ETB</span></div>`;
+            html += `<div class="loc-total"><span>Total</span><span>${locationGroups[loc].locTotal.toFixed(2)} ETB</span></div></div>`;
         }
-        sumContent.innerHTML += `<div style="font-weight:bold; color:#2196f3; margin:20px 0 5px 0; font-size:14px;">&#128179; Individual Totals (Grand Total to Pay)</div>`;
-        let payBoxHTML = `<div class="total-pay-box">`;
-        for (let name in studentGrandTotals) {
-            payBoxHTML += `<div class="summary-item"><span>${name}:</span> <span>${studentGrandTotals[name].toFixed(2)} ETB</span></div>`;
-        }
-        payBoxHTML += `</div>`;
-        sumContent.innerHTML += payBoxHTML;
-        sumContent.innerHTML += `<div class="grand-total-box"><div style="font-size:12px; opacity:0.8;">ALL STUDENTS TOTAL EXPENDITURE</div><div style="font-size:22px; font-weight:bold;">${absoluteTotal.toFixed(2)} ETB</div></div>`;
+
+        html += `<div class="pay-block"><div class="pay-block-title">💳 Individual Totals</div>`;
+        for (let name in studentGrandTotals)
+            html += `<div class="pay-row"><span>${name}</span><span>${studentGrandTotals[name].toFixed(2)} ETB</span></div>`;
+        html += `</div>`;
+
+        html += `<div class="grand-total-block">
+            <div class="gt-label">All Students Total Expenditure</div>
+            <div class="gt-amount">${absoluteTotal.toFixed(2)} ETB</div>
+            <div class="gt-sub">Split across ${members.length} member${members.length !== 1 ? 's' : ''}</div>
+        </div>`;
+
+        sum.innerHTML = html;
     }
 
-    // --- FIXED EDIT LOGIC ---
+    /* ─── QR ─── */
+    function showShareQR() {
+        showNotification({ title: "Share Group", msg: `Scan to join "${groupID}"` });
+        setTimeout(() => new QRCode(document.getElementById('qrcode'), { text: window.location.href, width: 180, height: 180 }), 100);
+    }
+
+    /* ─── EDIT ─── */
     function openEditModal(key) {
         const record = historyEntries.find(e => e.id === key);
-        if(!record) return;
-
+        if (!record) return;
         document.getElementById('editDate').value = record.date;
         document.getElementById('editLoc').value = record.location;
         document.getElementById('editMeal').value = record.meal;
         document.getElementById('editTotal').value = record.total;
-
-        const checkList = document.getElementById('editMemberChecklist');
-        checkList.innerHTML = '';
+        const cl = document.getElementById('editMemberChecklist');
+        cl.innerHTML = '';
         members.forEach(m => {
             const isChecked = record.individualCosts.hasOwnProperty(m);
-            checkList.innerHTML += `
-                <div class="edit-member-item">
-                    <span>${m}</span>
-                    <input type="checkbox" class="edit-m-check" data-name="${m}" ${isChecked ? 'checked' : ''}>
-                </div>`;
+            cl.innerHTML += `<div class="edit-check-row"><label>${m}</label><input type="checkbox" class="edit-m-check" data-name="${m}" ${isChecked ? 'checked' : ''}></div>`;
         });
-
-        document.getElementById('editModal').style.display = 'flex';
+        document.getElementById('editModal').classList.add('show');
         document.getElementById('saveEditBtn').onclick = () => {
             groupRef.child('password').once('value', (snap) => {
                 const pass = snap.val();
-                if(!pass || groupID === "public_normal") {
-                    performUpdate(key);
-                } else {
-                    // Hide edit modal first to reveal password modal
-                    document.getElementById('editModal').style.display = 'none';
+                if (!pass || groupID === "public_normal") { performUpdate(key); }
+                else {
+                    document.getElementById('editModal').classList.remove('show');
                     showNotification({
-                        title: "Admin Required", 
-                        msg: "Enter password to update record:", 
-                        isPassword: true,
+                        title: "Admin Required", msg: "Enter password to update:", isPassword: true,
                         onConfirm: (input) => {
-                            if(input === pass) {
-                                performUpdate(key);
-                            } else {
-                                showNotification({ title: "Denied", msg: "Incorrect Password" });
-                            }
+                            if (input === pass) performUpdate(key);
+                            else showNotification({ title: "Denied", msg: "Incorrect password." });
                         }
                     });
                 }
@@ -546,106 +955,84 @@
         const total = parseFloat(document.getElementById('editTotal').value) || 0;
         const checks = document.querySelectorAll('.edit-m-check');
         const active = Array.from(checks).filter(c => c.checked);
-
-        if(!loc || total <= 0 || active.length === 0) {
-            alert("Valid details required.");
-            return;
-        }
-
-        const perPerson = roundUp(total / active.length);
-        let detailText = [];
-        let detailData = {};
-        active.forEach(c => {
-            const name = c.getAttribute('data-name');
-            detailText.push(`${name}(${perPerson.toFixed(2)})`);
-            detailData[name] = perPerson;
-        });
-
-        const updatedRecord = {
-            date: date, location: loc, meal: meal, total: total,
-            details: detailText.join(', '), individualCosts: detailData
-        };
-
-        groupRef.child('history').child(key).update(updatedRecord);
-        document.getElementById('editModal').style.display = 'none';
-        showNotification({ title: "Updated", msg: "Record updated successfully." });
+        if (!loc || total <= 0 || active.length === 0) { showToast('Valid details required.', 'error'); return; }
+        const per = roundUp(total / active.length);
+        let detailText = [], detailData = {};
+        active.forEach(c => { detailText.push(`${c.dataset.name}(${per.toFixed(2)})`); detailData[c.dataset.name] = per; });
+        groupRef.child('history').child(key).update({ date, location: loc, meal, total, details: detailText.join(', '), individualCosts: detailData });
+        document.getElementById('editModal').classList.remove('show');
+        showToast('Record updated.', 'success');
     }
 
+    /* ─── DELETE ─── */
     function deleteSingleEntry(key) {
-        groupRef.child('password').once('value', (snapshot) => {
-            const adminPass = snapshot.val();
-            const performDelete = () => { groupRef.child('history').child(key).remove(); };
+        groupRef.child('password').once('value', (snap) => {
+            const adminPass = snap.val();
+            const performDelete = () => groupRef.child('history').child(key).remove();
             if (!adminPass || groupID === "public_normal") {
                 showNotification({ title: "Delete", msg: "Remove this record?", isConfirmType: true, onConfirm: performDelete });
             } else {
                 showNotification({
                     title: "Confirm", msg: "Enter password to delete:", isPassword: true,
-                    onConfirm: (passInput) => {
-                        if (passInput === adminPass) performDelete();
-                        else showNotification({ title: "Denied", msg: "Incorrect Password!" });
-                    }
+                    onConfirm: (p) => { if (p === adminPass) performDelete(); else showNotification({ title: "Denied", msg: "Incorrect password!" }); }
                 });
             }
         });
     }
 
+    /* ─── EXPORT ─── */
     function exportToExcel() {
         try {
-            const excelData = historyEntries.map(item => {
-                const base = { date: item.date, location: item.location, meal: item.meal, total: item.total };
-                return Object.assign(base, item.individualCosts);
-            });
-            const worksheet = XLSX.utils.json_to_sheet(excelData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Meal History");
-            XLSX.writeFile(workbook, "Meal_History_" + groupID + ".xlsx");
-            showNotification({ title: "Export Success", msg: "File downloaded." });
-        } catch (e) { alert("Export failed: " + e.message); }
+            const data = historyEntries.map(item => Object.assign({ date: item.date, location: item.location, meal: item.meal, total: item.total }, item.individualCosts));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Meal History");
+            XLSX.writeFile(wb, "Meal_History_" + groupID + ".xlsx");
+            showToast('Excel exported.', 'success');
+        } catch (e) { showToast('Export failed: ' + e.message, 'error'); }
     }
 
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(18); doc.setTextColor(230, 126, 34); doc.text(`Meal Report: ${groupID}`, 14, 20);
-        doc.setFontSize(10); doc.setTextColor(100); doc.text(`Generated on: ${getEthiopianDate()}`, 14, 28);
+        doc.setFontSize(18); doc.setTextColor(249, 115, 22);
+        doc.text(`Meal Report: ${groupID}`, 14, 20);
+        doc.setFontSize(10); doc.setTextColor(120);
+        doc.text(`Generated: ${getEthiopianDate()}`, 14, 28);
         doc.autoTable({
-            html: '#historyTable', startY: 35, theme: 'striped', headStyles: { fillColor: [230, 126, 34] },
-            columns: [ {header:'Date',dataKey:'date'}, {header:'Loc',dataKey:'loc'}, {header:'Meal',dataKey:'meal'}, {header:'Total',dataKey:'total'}, {header:'Details',dataKey:'details'} ],
-            didParseCell: function(data) { if (data.column.index === 5) data.cell.text = ''; }
+            html: '#historyTable', startY: 35, theme: 'striped',
+            headStyles: { fillColor: [249, 115, 22] },
         });
         const finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(14); doc.setTextColor(39, 174, 96); doc.text("Summary Totals", 14, finalY);
-        doc.setFontSize(11); doc.setTextColor(0);
-        const summaryItems = document.querySelectorAll('#summaryBox .summary-item');
-        summaryItems.forEach((item, index) => {
-            const text = item.innerText.replace(/\n/g, ": ");
-            doc.text(text, 14, finalY + 8 + (index * 7));
+        doc.setFontSize(13); doc.setTextColor(34, 197, 94);
+        doc.text("Summary", 14, finalY);
+        doc.setFontSize(10); doc.setTextColor(0);
+        document.querySelectorAll('#summaryBox .loc-row, #summaryBox .pay-row').forEach((el, i) => {
+            doc.text(el.innerText.replace(/\n/g, ': '), 14, finalY + 8 + i * 7);
         });
         doc.save(`Meal_Report_${groupID}.pdf`);
-        showNotification({ title: "PDF Created", msg: "Report generated." });
+        showToast('PDF exported.', 'success');
     }
 
+    /* ─── CLEAR ─── */
     function clearAllData() {
-        groupRef.child('password').once('value', (snapshot) => {
-            const adminPass = snapshot.val();
+        groupRef.child('password').once('value', (snap) => {
+            const adminPass = snap.val();
             const performClear = () => {
                 showNotification({
-                    title: "Final Check", msg: "Clear all history?", isConfirmType: true,
+                    title: "Final Check", msg: "Clear ALL history and members?", isConfirmType: true,
                     onConfirm: () => { groupRef.child('history').remove(); groupRef.child('members').remove(); location.reload(); }
                 });
             };
             if (!adminPass || groupID === "public_normal") performClear();
             else {
                 showNotification({
-                    title: "Confirm", msg: "Enter password to clear data:", isPassword: true,
-                    onConfirm: (passInput) => {
-                        if (passInput === adminPass) performClear();
-                        else showNotification({ title: "Denied", msg: "Incorrect password." });
-                    }
+                    title: "Confirm", msg: "Enter password to clear:", isPassword: true,
+                    onConfirm: (p) => { if (p === adminPass) performClear(); else showNotification({ title: "Denied", msg: "Incorrect password." }); }
                 });
             }
         });
     }
-    </script>
+</script>
 </body>
 </html>
