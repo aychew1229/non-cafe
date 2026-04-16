@@ -83,7 +83,7 @@
             border: 1px solid var(--border-accent);
             border-radius: 50px;
             padding: 6px 16px;
-            font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+            font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
             color: var(--accent);
             text-transform: uppercase;
             margin-bottom: 18px;
@@ -259,6 +259,8 @@
             text-transform: uppercase; color: var(--text-muted);
             display: flex; align-items: center; gap: 10px;
             margin: 24px 0 14px;
+            text-align: center:
+            
         }
         .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
@@ -467,14 +469,12 @@
 
 <div class="app-wrap">
 
-    <!-- HEADER -->
     <div class="app-header">
         <div class="logo-badge">🍽 Non-Cafe System</div>
         <h1>Ethiopian University<br>Meal Tracker</h1>
         <p>Split meals, track expenses, stay organized.</p>
     </div>
 
-    <!-- GROUP BAR -->
     <div class="group-bar">
         <div class="card-label"><span>👥</span> Group Session</div>
         <div class="join-row">
@@ -484,7 +484,6 @@
         <span class="group-status" id="currentGroupDisplay">Loading...</span>
     </div>
 
-    <!-- MEMBERS CARD -->
     <div class="card">
         <div class="card-label"><span>🙋</span> Add Members</div>
         <div class="input-row">
@@ -494,9 +493,8 @@
         <div class="member-badges" id="memberBadges"></div>
     </div>
 
-    <!-- ENTRY CARD -->
     <div class="card accent-border">
-        <div class="card-label"><span>📝</span> Log a Meal</div>
+        <div class="card-label"><span>📝</span> Record a Meal</div>
         <div class="input-row">
             <div class="field">
                 <label>Location</label>
@@ -528,7 +526,6 @@
         </button>
     </div>
 
-    <!-- HISTORY SECTION -->
     <div class="section-title">Saved History</div>
 
     <div class="actions-grid">
@@ -550,7 +547,7 @@
             <table id="historyTable">
                 <thead>
                     <tr>
-                        <th>Date (E.C)</th>
+                        <th>Date(E.C)</th>
                         <th>Location</th>
                         <th>Meal</th>
                         <th>Total</th>
@@ -563,7 +560,6 @@
         </div>
     </div>
 
-    <!-- SUMMARY -->
     <div class="summary-card" id="summaryBox">
         <h4>📊 Monthly Summary</h4>
         <div id="summaryContent">
@@ -580,10 +576,8 @@
 
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- MAIN MODAL -->
 <div id="modernModal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-title" id="modalHead">Notification</div>
@@ -597,7 +591,6 @@
     </div>
 </div>
 
-<!-- EDIT MODAL -->
 <div id="editModal" class="modal-overlay" style="z-index:10000">
     <div class="modal-box">
         <div class="modal-title">✏️ Edit Meal Record</div>
@@ -669,10 +662,31 @@
         }
     }
 
+    /* ─── FIXED MEAL TYPE LOGIC (ETHIOPIAN TIME) ─── */
     function setSmartMealDefault() {
-        const hour = new Date().getHours();
+        const now = new Date();
+        const hr = now.getHours();
+        
+        // Convert Gregorian Hour to Ethiopian Hour (Roughly)
+        // Ethiopian 12:00 morning = 6:00 AM Gregorian
+        let ethHour;
+        if (hr >= 6) { ethHour = hr - 6; }
+        else { ethHour = hr + 18; } 
+
         const s = document.getElementById('mealType');
-        s.value = hour >= 7 && hour < 12 ? "Breakfast" : hour >= 12 && hour < 18 ? "Lunch" : "Dinner";
+        
+        // Morning 12:00 - 5:00 = Breakfast
+        if (ethHour >= 0 && ethHour < 5) {
+            s.value = "Breakfast";
+        } 
+        // 6:00 - 10:00 = Lunch
+        else if (ethHour >= 6 && ethHour <= 10) {
+            s.value = "Lunch";
+        }
+        // Afternoon/Night 10:00 - 3:00 = Dinner
+        else {
+            s.value = "Dinner";
+        }
     }
 
     window.onload = function () { initPlatform(); setSmartMealDefault(); };
@@ -708,7 +722,7 @@
             const existingPass = snap.val();
             if (existingPass) {
                 showNotification({
-                    title: "Private Group", msg: "Enter password to join:", isPassword: true,
+                    title: "This is Private Group", msg: "Please Enter password to join:", isPassword: true,
                     onConfirm: (p) => {
                         if (p === existingPass) window.location.href = window.location.pathname + '?group=' + newGroup;
                         else showNotification({ title: "Access Denied", msg: "Incorrect password." });
@@ -809,10 +823,12 @@
         });
     }
 
-    /* ─── ETHIOPIAN DATE ─── */
+    /* ─── FIXED ETHIOPIAN DATE LOGIC ─── */
     function getEthiopianDate() {
         const now = new Date();
-        const ec = new Date(now.getTime() - (2809 * 24 * 60 * 60 * 1000));
+        // Adjusting milliseconds to align properly with current Ethiopian Day (08/08/2018)
+        // 2808 days is standard for early-mid year offset
+        const ec = new Date(now.getTime() - (2808 * 24 * 60 * 60 * 1000));
         return `${String(ec.getDate()).padStart(2,'0')}/${String(ec.getMonth()+1).padStart(2,'0')}/${ec.getFullYear()}`;
     }
 
@@ -1035,4 +1051,4 @@
     }
 </script>
 </body>
-</html>
+<html>
