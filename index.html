@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta name="google-site-verification" content="Q3LnD16bcmpmIpjaOD6c4TFTx2gGMjw0h7EoS-69vN8" />
+    <meta name="description" content="An open-source university project for tracking shared meal expenses among students in Ethiopian University.">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
@@ -402,10 +403,15 @@
             width: 100%; max-width: 420px;
             max-height: 90vh; overflow-y: auto;
             animation: slideUp 0.25s ease;
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+        
         @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: none; } }
-        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .modal-msg { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; text-align: center; width: 100%;}
+        .modal-msg { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; text-align: center; width: 100%;}
         .modal-input { 
             width: 100%; background: var(--bg3); border: 1px solid var(--border);
             border-radius: var(--radius-sm); color: var(--text);
@@ -414,7 +420,7 @@
             text-align: center;
         }
         .modal-input:focus { border-color: var(--accent); }
-        .modal-footer { display: flex; gap: 10px; }
+        .modal-footer { display: flex; gap: 10px; width: 100%; margin-top: 10px;}
         .modal-footer .btn { flex: 1; padding: 13px; font-size: 14px; }
         #qrcode { display: flex; justify-content: center; margin-bottom: 20px; }
 
@@ -488,6 +494,9 @@
         <div class="logo-badge">🍽 Non-Cafe System</div>
         <h1>Ethiopian University<br>Meal Tracker</h1>
         <p>Split meals, track expenses, stay organized.</p>
+        <p style="background: #fee2e2; color: #991b1b; padding: 10px; text-align: center; font-size: 12px; border-bottom: 1px solid #f87171;">
+    <strong>STUDENT PROJECT NOTICE:</strong> This is a demo for a University Meal Tracker.
+</p>
     </div>
 
     <div class="group-bar">
@@ -737,7 +746,7 @@
             const existingPass = snap.val();
             if (existingPass) {
                 showNotification({
-                    title: "This is Private Group", msg: "Please Enter password to join:", isPassword: true,
+                    title: "Group Access Code?", msg: "Please Enter the code to join this session:", isPassword: true,
                     onConfirm: (p) => {
                         if (p === existingPass) window.location.href = window.location.pathname + '?group=' + newGroup;
                         else showNotification({ title: "Access Denied", msg: "Incorrect password." });
