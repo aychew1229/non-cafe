@@ -6,7 +6,7 @@
 
 A high-performance, mobile-first web application engineered specifically for Ethiopian university students. This system simplifies the complexity of "Non-Cafe" (off-campus) living by managing shared meal expenses, group finances, and local calendar tracking.
 
-[**Launch Web App**](https://robel1229.github.io/non-cafe/)
+[**Launch Web App**](https://aychew1229.github.io/non-cafe/)
 
 ---
 
