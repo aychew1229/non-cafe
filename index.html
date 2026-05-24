@@ -732,8 +732,17 @@
             if (onConfirm) onConfirm(passVal);
         };
     }
-
-    function closeModal() { document.getElementById('modernModal').classList.remove('show'); }
+    
+function closeModal() { 
+    // Hide the modal layout overlay
+    document.getElementById('modernModal').classList.remove('show'); 
+    
+    // Clear out injected dynamic content elements to reset structural constraints
+    document.getElementById('qrcode').innerHTML = "";
+    document.getElementById('modalInputArea').innerHTML = "";
+    document.getElementById('modalBody').innerText = "";
+    document.getElementById('modalHead').innerText = "";
+}
 
     /* ─── GROUP ─── */
     function switchGroup() {
