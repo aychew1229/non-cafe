@@ -494,6 +494,33 @@
             margin-bottom: 10px;
         }
         .apk-note a { color: var(--accent); font-weight: 600; }
+
+        /* ── DESKTOP LAYOUT ── */
+        .main-grid { display: block; }
+        .col-left, .col-right { display: block; }
+
+        @media (min-width: 980px) {
+            .app-wrap { max-width: 1180px; padding: 20px 32px 60px; }
+            .app-header { padding: 48px 0 36px; }
+            .main-grid {
+                display: grid;
+                grid-template-columns: 400px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+            .col-left {
+                display: flex; flex-direction: column; gap: 14px;
+                position: sticky; top: 20px;
+            }
+            .col-right { display: flex; flex-direction: column; gap: 14px; }
+            .col-right .section-title { margin-top: 0; }
+            .table-scroll { max-height: 560px; }
+        }
+
+        @media (min-width: 1280px) {
+            .app-wrap { max-width: 1320px; }
+            .col-left { width: 420px; }
+        }
     </style>
 </head>
 <body>
@@ -507,6 +534,8 @@
         <p> <strong>NOTICE:</strong> This is a demo for Students Meal Tracker. </p>
     </div>
 
+    <div class="main-grid">
+    <div class="col-left">
     <div class="group-bar">
         <div class="card-label"><span>👥</span> Group Session</div>
         <div class="join-row">
@@ -558,6 +587,9 @@
         </button>
     </div>
 
+    </div>
+
+    <div class="col-right">
     <div class="section-title">Saved History</div>
 
     <div class="actions-grid">
@@ -600,6 +632,9 @@
                 <p>No records yet. Save a meal to see the summary.</p>
             </div>
         </div>
+    </div>
+
+    </div>
     </div>
 
     <button class="btn btn-red btn-sm" onclick="clearAllData()" style="margin-top:4px">
@@ -702,7 +737,7 @@
         if (hr >= 6) { ethHour = hr - 6; }
         else { ethHour = hr + 18; }
         const s = document.getElementById('mealType');
-        if (ethHour >= 0 && ethHour < 5) {
+        if (ethHour >= 0 && ethHour < 6) {
             s.value = "Breakfast";
         } else if (ethHour >= 6 && ethHour <= 10) {
             s.value = "Lunch";
@@ -858,7 +893,10 @@ function closeModal() {
         let gDayOfYear = 0;
         for (let i = 1; i < gMonth; i++) gDayOfYear += daysInMonth[i];
         gDayOfYear += gDay;
-        let newYearDay = ((gYear + 1) % 4 === 0) ? 255 : 254;
+        // New Year's day-of-year shifts to 255 either when the current year
+        // itself is a leap year (Feb has 29 days) OR when the following year
+        // is a leap year (Enkutatash moves from Sept 11 to Sept 12).
+        let newYearDay = (isGregorianLeap || ((gYear + 1) % 4 === 0)) ? 255 : 254;
         if (gDayOfYear >= newYearDay) {
             eYear = gYear - 7;
             let diff = gDayOfYear - newYearDay;
