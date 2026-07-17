@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="google-site-verification" content="Q3LnD16bcmpmIpjaOD6c4TFTx2gGMjw0h7EoS-69vN8" />
-    <meta name="description" content="An open-source university project for tracking shared meal expenses among students in Ethiopian University.">
+    <meta name="description"
+        content="An open-source university project for tracking shared meal expenses among students in Ethiopian University.">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a0729">
+    <!-- theme-color meta is not supported by Firefox, Firefox for Android, and Opera -->
+    <meta name="msapplication-TileColor" content="#1a0729">
     <title>Non-Cafe System </title>
     <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -29,8 +35,8 @@
             --bg: #0a0a0f;
             --bg2: #111118;
             --bg3: #18181f;
-            --border: rgba(255,255,255,0.07);
-            --border-accent: rgba(249,115,22,0.35);
+            --border: rgba(255, 255, 255, 0.07);
+            --border-accent: rgba(249, 115, 22, 0.35);
             --text: #f1f1f1;
             --text-muted: #6b6b80;
             --text-dim: #9999aa;
@@ -40,7 +46,11 @@
             --radius-sm: 10px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Sora', sans-serif;
@@ -53,50 +63,67 @@
         body::before {
             content: '';
             position: fixed;
-            top: -200px; left: -200px;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%);
-            pointer-events: none; z-index: 0;
+            top: -200px;
+            left: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(22, 120, 249, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
         }
+
         body::after {
             content: '';
             position: fixed;
-            bottom: -200px; right: -200px;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
-            pointer-events: none; z-index: 0;
+            bottom: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .app-wrap {
-            position: relative; z-index: 1;
-            max-width: 640px;
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 16px 60px;
+            padding: 18px 12px 20px;
         }
 
         .app-header {
+           max-width: 100%;
             text-align: center;
-            padding: 40px 0 30px;
+            padding: 30px 0 20px;
         }
+
         .app-header .logo-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(249,115,22,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(249, 115, 22, 0.1);
             border: 1px solid var(--border-accent);
             border-radius: 50px;
             padding: 6px 16px;
-            font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
             color: var(--accent);
             text-transform: uppercase;
             margin-bottom: 18px;
         }
+
         .app-header h1 {
             font-size: clamp(26px, 6vw, 38px);
             font-weight: 800;
             line-height: 1.1;
             background: linear-gradient(135deg, #fff 0%, var(--accent-dim) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .app-header p {
             color: var(--text-muted);
             font-size: 13px;
@@ -112,8 +139,14 @@
             margin-bottom: 14px;
             transition: border-color 0.2s;
         }
-        .card:hover { border-color: rgba(255,255,255,0.12); }
-        .card.accent-border { border-color: var(--border-accent); }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .card.accent-border {
+            border-color: var(--border-accent);
+        }
 
         .card-label {
             font-size: 10px;
@@ -122,17 +155,43 @@
             text-transform: uppercase;
             color: var(--text-muted);
             margin-bottom: 14px;
-            display: flex; align-items: center; gap: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .card-label span { font-size: 16px; }
 
-        .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .input-row:last-child { margin-bottom: 0; }
+        .card-label span {
+            font-size: 16px;
+        }
 
-        .field { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-        .field label { font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.05em; }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
 
-        input[type="text"], input[type="number"], input[type="password"], select {
+        .input-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .field {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="password"],
+        select {
             background: var(--bg3);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
@@ -144,53 +203,115 @@
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
             -webkit-appearance: none;
+            appearance: none;
         }
-        input:focus, select:focus {
+
+        input:focus,
+        select:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
-        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-        input::placeholder { color: var(--text-muted); }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+        }
 
         .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             padding: 12px 20px;
-            border: none; border-radius: var(--radius-sm);
+            border: none;
+            border-radius: var(--radius-sm);
             font-family: 'Sora', sans-serif;
-            font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
             white-space: nowrap;
         }
-        .btn:active { transform: scale(0.97); }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
 
         .btn-primary {
             background: var(--accent);
             color: #fff;
-            box-shadow: 0 4px 20px rgba(249,115,22,0.3);
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
         }
-        .btn-primary:hover { background: #fb923c; box-shadow: 0 6px 24px rgba(249,115,22,0.45); }
+
+        .btn-primary:hover {
+            background: #fb923c;
+            box-shadow: 0 6px 24px rgba(249, 115, 22, 0.45);
+        }
 
         .btn-ghost {
             background: var(--bg3);
             color: var(--text-dim);
             border: 1px solid var(--border);
         }
-        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-        .btn-blue { background: var(--blue); color: #fff; }
-        .btn-blue:hover { background: #60a5fa; }
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
-        .btn-green { background: var(--green); color: #000; font-weight: 700; }
-        .btn-green:hover { background: #4ade80; }
+        .btn-blue {
+            background: var(--blue);
+            color: #fff;
+        }
 
-        .btn-red { background: var(--red); color: #fff; }
-        .btn-red:hover { background: #f87171; }
+        .btn-blue:hover {
+            background: #60a5fa;
+        }
 
-        .btn-dark { background: var(--bg3); border: 1px solid var(--border); color: var(--text-dim); }
-        .btn-dark:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+        .btn-green {
+            background: var(--green);
+            color: #000;
+            font-weight: 700;
+        }
 
-        .btn-full { width: 100%; }
-        .btn-sm { padding: 8px 14px; font-size: 12px; }
+        .btn-green:hover {
+            background: #4ade80;
+        }
+
+        .btn-red {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .btn-red:hover {
+            background: #f87171;
+        }
+
+        .btn-dark {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .btn-dark:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 12px;
+        }
 
         .group-bar {
             background: var(--card);
@@ -198,27 +319,48 @@
             border-radius: var(--radius);
             padding: 16px 20px;
             margin-bottom: 14px;
-            display: flex; flex-direction: column; gap: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .group-bar .join-row { display: flex; gap: 8px; }
-        .group-bar .join-row input { flex: 1; }
+
+        .group-bar .join-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .group-bar .join-row input {
+            flex: 1;
+        }
+
+        .flex-grow {
+            flex: 1;
+        }
+
         .group-status {
             font-size: 11px;
             font-family: 'JetBrains Mono', monospace;
             color: var(--accent);
-            background: rgba(249,115,22,0.08);
+            background: rgba(249, 115, 22, 0.08);
             padding: 4px 10px;
             border-radius: 6px;
             display: inline-block;
         }
 
-        .member-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .member-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
         .member-badge {
             background: var(--bg3);
             border: 1px solid var(--border);
             border-radius: 50px;
             padding: 4px 12px;
-            font-size: 11px; color: var(--text-dim);
+            font-size: 11px;
+            color: var(--text-dim);
             font-weight: 500;
         }
 
@@ -228,6 +370,7 @@
             gap: 10px;
             margin: 16px 0;
         }
+
         .student-card {
             background: var(--bg3);
             border: 1px solid var(--border);
@@ -237,31 +380,65 @@
             transition: border-color 0.2s, transform 0.2s;
             cursor: pointer;
         }
-        .student-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .student-card.active { border-color: var(--green); background: rgba(34,197,94,0.05); }
-        .student-card .s-name { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
+
+        .student-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .student-card.active {
+            border-color: var(--green);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .student-card .s-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-dim);
+        }
+
         .student-card .s-cost {
-            font-size: 18px; font-weight: 800;
+            font-size: 18px;
+            font-weight: 800;
             color: var(--green);
             font-family: 'JetBrains Mono', monospace;
         }
-        .student-card .s-cost.zero { color: var(--text-muted); }
-        .student-card .s-check { display: none; }
+
+        .student-card .s-cost.zero {
+            color: var(--text-muted);
+        }
+
+        .student-card .s-check {
+            display: none;
+        }
 
         .section-title {
-            font-size: 11px; 
-            font-weight: 700; 
+            font-size: 11px;
+            font-weight: 700;
             letter-spacing: 0.12em;
-            text-transform: uppercase; 
+            text-transform: uppercase;
             color: var(--text-muted);
-            display: flex; 
-            align-items: center; 
+            display: flex;
+            align-items: center;
             justify-content: center;
             gap: 15px;
             margin: 24px 0 14px;
         }
-        .section-title::before { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        .section-title::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
 
         .actions-grid {
             display: grid;
@@ -277,18 +454,34 @@
             overflow: hidden;
             margin-bottom: 14px;
         }
-        .table-scroll { overflow-x: auto; max-height: 380px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 480px; }
+
+        .table-scroll {
+            overflow-x: auto;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 480px;
+        }
+
         thead th {
             background: var(--card2);
             padding: 12px 14px;
-            font-size: 10px; font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             color: var(--text-muted);
             text-align: left;
-            position: sticky; top: 0; z-index: 5;
+            position: sticky;
+            top: 0;
+            z-index: 5;
             border-bottom: 1px solid var(--border);
         }
+
         td {
             padding: 11px 14px;
             font-size: 12px;
@@ -296,25 +489,63 @@
             color: var(--text-dim);
             vertical-align: middle;
         }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-        .td-loc { color: var(--text); font-weight: 600; }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .td-loc {
+            color: var(--text);
+            font-weight: 600;
+        }
+
         .td-meal {
             display: inline-block;
-            background: rgba(249,115,22,0.1);
+            background: rgba(249, 115, 22, 0.1);
             color: var(--accent);
-            border-radius: 6px; padding: 2px 8px;
-            font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
         }
-        .td-total { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
-        .td-details { color: var(--blue); font-size: 11px; max-width: 140px; }
+
+        .td-total {
+            color: var(--green);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .td-details {
+            color: var(--blue);
+            font-size: 11px;
+            max-width: 140px;
+        }
+
         .btn-action {
-            background: none; border: none; cursor: pointer;
-            color: var(--text-muted); font-size: 16px; padding: 4px 6px;
-            border-radius: 6px; transition: all 0.15s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 16px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: all 0.15s;
         }
-        .btn-action:hover { background: var(--bg3); color: var(--text); }
-        .btn-action.del:hover { color: var(--red); }
+
+        .btn-action:hover {
+            background: var(--bg3);
+            color: var(--text);
+        }
+
+        .btn-action.del:hover {
+            color: var(--red);
+        }
 
         .summary-card {
             background: var(--card);
@@ -323,10 +554,15 @@
             padding: 20px;
             margin-bottom: 14px;
         }
+
         .summary-card h4 {
-            font-size: 12px; font-weight: 700; color: var(--text-muted);
-            letter-spacing: 0.1em; text-transform: uppercase;
-            margin-bottom: 16px; padding-bottom: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
 
@@ -339,24 +575,27 @@
             padding: 14px;
             margin-bottom: 10px;
         }
+
         .loc-block-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 10px;
         }
+
         .loc-block-name {
             font-size: 13px;
             font-weight: 700;
             color: var(--text);
         }
+
         /* Delete-location button */
         .btn-del-loc {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            background: rgba(239,68,68,0.1);
-            border: 1px solid rgba(239,68,68,0.25);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
             border-radius: 8px;
             color: var(--red);
             font-family: 'Sora', sans-serif;
@@ -367,28 +606,72 @@
             transition: background 0.2s, border-color 0.2s, transform 0.15s;
             white-space: nowrap;
         }
+
         .btn-del-loc:hover {
-            background: rgba(239,68,68,0.2);
-            border-color: rgba(239,68,68,0.5);
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
             transform: scale(0.97);
         }
-        .btn-del-loc:active { transform: scale(0.94); }
 
-        .loc-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
-        .loc-total { border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 8px; color: var(--green); font-weight: 700; font-size: 13px; display: flex; justify-content: space-between; }
+        .btn-del-loc:active {
+            transform: scale(0.94);
+        }
+
+        .loc-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+
+        .loc-total {
+            border-top: 1px dashed var(--border);
+            padding-top: 8px;
+            margin-top: 8px;
+            color: var(--green);
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+        }
 
         .pay-block {
             background: var(--bg3);
-            border: 1px solid rgba(59,130,246,0.2);
+            border: 1px solid rgba(59, 130, 246, 0.2);
             border-left: 3px solid var(--blue);
             border-radius: var(--radius-sm);
             padding: 14px;
             margin-top: 14px;
         }
-        .pay-block-title { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
-        .pay-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-dim); padding: 5px 0; border-bottom: 1px solid var(--border); }
-        .pay-row:last-child { border-bottom: none; }
-        .pay-row span:last-child { font-family: 'JetBrains Mono', monospace; color: var(--text); font-weight: 600; }
+
+        .pay-block-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .pay-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-dim);
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pay-row:last-child {
+            border-bottom: none;
+        }
+
+        .pay-row span:last-child {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+            font-weight: 600;
+        }
 
         .grand-total-block {
             background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -397,55 +680,150 @@
             text-align: center;
             margin-top: 14px;
         }
-        .grand-total-block .gt-label { font-size: 10px; opacity: 0.8; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
-        .grand-total-block .gt-amount { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
-        .grand-total-block .gt-sub { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+        .grand-total-block .gt-label {
+            font-size: 10px;
+            opacity: 0.8;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .grand-total-block .gt-amount {
+            font-size: 32px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 4px;
+        }
+
+        .grand-total-block .gt-sub {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
 
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75);
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center;
-            z-index: 9999; padding: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
         }
-        .modal-overlay.show { display: flex; }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
         .modal-box {
             background: var(--card2);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 28px;
-            width: 100%; max-width: 420px;
-            max-height: 90vh; overflow-y: auto;
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
             animation: slideUp 0.25s ease;
-            text-align: center; 
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: none; } }
-        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; text-align: center; width: 100%;}
-        .modal-msg { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; text-align: center; width: 100%;}
-        .modal-input { 
-            width: 100%; background: var(--bg3); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text);
-            font-family: 'Sora', sans-serif; font-size: 15px;
-            padding: 13px 16px; margin-bottom: 20px; outline: none;
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .modal-msg {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            line-height: 1.6;
+            text-align: center;
+            width: 100%;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            padding: 13px 16px;
+            margin-bottom: 20px;
+            outline: none;
             text-align: center;
         }
-        .modal-input:focus { border-color: var(--accent); }
-        .modal-footer { display: flex; gap: 10px; width: 100%; margin-top: 10px;}
-        .modal-footer .btn { flex: 1; padding: 13px; font-size: 14px; }
-        #qrcode { display: flex; justify-content: center; margin-bottom: 20px; }
+
+        .modal-input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            padding: 13px;
+            font-size: 14px;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
         .edit-check-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 12px; border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 8px;
             transition: background 0.15s;
         }
-        .edit-check-row:hover { background: var(--bg3); }
-        .edit-check-row label { font-size: 13px; color: var(--text); }
+
+        .edit-check-row:hover {
+            background: var(--bg3);
+        }
+
+        .edit-check-row label {
+            font-size: 13px;
+            color: var(--text);
+        }
+
         input[type="checkbox"] {
-            width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
         }
 
         footer {
@@ -455,35 +833,68 @@
             color: var(--text-muted);
             line-height: 1.8;
         }
-        footer a { color: var(--accent); text-decoration: none; }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
 
         .empty-state {
             padding: 40px 20px;
             text-align: center;
             color: var(--text-muted);
         }
-        .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-        .empty-state p { font-size: 13px; }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
 
         .toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-            background: var(--card2); border: 1px solid var(--border);
-            border-radius: 12px; padding: 12px 20px;
-            font-size: 13px; font-weight: 500;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             z-index: 99999;
             transition: transform 0.3s ease;
-            max-width: 320px; text-align: center;
+            max-width: 320px;
+            text-align: center;
             pointer-events: none;
             transform: translateX(-50%) translateY(200%);
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast.success { border-color: var(--green); color: var(--green); }
-        .toast.error { border-color: var(--red); color: var(--red); }
-        .toast.info { border-color: var(--accent); color: var(--accent); }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .toast.error {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .toast.info {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
         .apk-note {
-            background: rgba(249,115,22,0.06);
+            background: rgba(249, 115, 22, 0.06);
             border: 1px dashed var(--border-accent);
             border-radius: var(--radius-sm);
             padding: 14px;
@@ -493,468 +904,549 @@
             display: none;
             margin-bottom: 10px;
         }
-        .apk-note a { color: var(--accent); font-weight: 600; }
+
+        .apk-note a {
+            color: var(--accent);
+            font-weight: 600;
+        }
 
         /* ── DESKTOP LAYOUT ── */
-        .main-grid { display: block; }
-        .col-left, .col-right { display: block; }
+        .main-grid {
+            display: block;
+        }
 
-        @media (min-width: 980px) {
-            .app-wrap { max-width: 1180px; padding: 20px 32px 60px; }
-            .app-header { padding: 48px 0 36px; }
+        .col-left,
+        .col-right {
+            display: block;
+        }
+
+        @media (min-width: 780px) {
+            .app-wrap {
+                max-width: 1180px;
+                padding: 20px 32px 60px;
+            }
+
+            .app-header {
+                padding: 56px 0 44px;
+                max-width: 1200px;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
+
+            .app-header .logo-badge {
+                font-size: 13px;
+                padding: 8px 20px;
+                margin-bottom: 24px;
+            }
+
+            .app-header h1 {
+                font-size: clamp(38px, 4.2vw, 56px);
+            }
+
+            .app-header p {
+                font-size: 15px;
+                max-width: 520px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .app-header p:last-child {
+                font-size: 13px;
+                opacity: .75;
+            }
+
             .main-grid {
                 display: grid;
                 grid-template-columns: 400px 1fr;
                 gap: 24px;
                 align-items: start;
             }
+
             .col-left {
-                display: flex; flex-direction: column; gap: 14px;
-                position: sticky; top: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                position: sticky;
+                top: 20px;
             }
-            .col-right { display: flex; flex-direction: column; gap: 14px; }
-            .col-right .section-title { margin-top: 0; }
-            .table-scroll { max-height: 560px; }
+
+            .col-right {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .col-right .section-title {
+                margin-top: 0;
+            }
+
+            .table-scroll {
+                max-height: 560px;
+            }
         }
 
         @media (min-width: 1280px) {
-            .app-wrap { max-width: 1320px; }
-            .col-left { width: 420px; }
+            .app-wrap {
+                max-width: 100%;
+            }
+
+            .col-left {
+                width: 415px;
+            }
         }
+        /* Utility classes moved from inline styles */
+        .flex-1 { flex: 1; }
+        .mt-8 { margin-top: 8px; }
+        .mt-4 { margin-top: 4px; }
+        .high-z { z-index: 10000; }
+        .card-label-compact { margin: 14px 0 8px; }
+        .edit-members { border: 1px solid var(--border); border-radius: 10px; padding: 6px; margin-bottom: 18px; }
     </style>
 </head>
+
 <body>
 
-<div class="app-wrap">
+    <div class="app-wrap">
 
-    <div class="app-header">
-        <div class="logo-badge">🍽 Non-Cafe System</div>
-        <h1>University Students<br>Meal Tracker</h1>
-        <p>Split meals, track expenses, stay organized.</p>
-        <p> <strong>NOTICE:</strong> This is a demo for Students Meal Tracker. </p>
-    </div>
-
-    <div class="main-grid">
-    <div class="col-left">
-    <div class="group-bar">
-        <div class="card-label"><span>👥</span> Group Session</div>
-        <div class="join-row">
-            <input type="text" id="groupInput" placeholder="Enter group ID or name">
-            <button class="btn btn-blue" onclick="switchGroup()">Join</button>
+        <div class="app-header">
+            <div class="logo-badge">🍽 Non-Cafe System</div>
+            <h1>University Students<br>Meal Tracker</h1>
+            <p>Split meals, track expenses, stay organized.</p>
+            <p> <strong>NOTICE:</strong> This is a demo for Students Meal Tracker. </p>
         </div>
-        <span class="group-status" id="currentGroupDisplay">Loading...</span>
-    </div>
 
-    <div class="card">
-        <div class="card-label"><span>🙋</span> Add Members</div>
-        <div class="input-row">
-            <input type="text" id="newMemberName" placeholder="Member name" style="flex:1" onkeydown="if(event.key==='Enter')addMember()">
-            <button class="btn btn-primary" onclick="addMember()">Add</button>
-        </div>
-        <div class="member-badges" id="memberBadges"></div>
-    </div>
+        <div class="main-grid">
+            <div class="col-left">
+                <div class="group-bar">
+                    <div class="card-label"><span>👥</span> Group Session</div>
+                    <div class="join-row">
+                        <input type="text" id="groupInput" placeholder="Enter group ID or name">
+                        <button class="btn btn-blue" onclick="switchGroup()">Join</button>
+                    </div>
+                    <span class="group-status" id="currentGroupDisplay">Loading...</span>
+                </div>
 
-    <div class="card accent-border">
-        <div class="card-label"><span>📝</span> Record a Meal</div>
-        <div class="input-row">
-            <div class="field">
-                <label>Location</label>
-                <input type="text" id="location" placeholder="e.g. Central, Amazon, Wude">
+                <div class="card">
+                    <div class="card-label"><span>🙋</span> Add Members</div>
+                    <div class="input-row">
+                        <input type="text" id="newMemberName" placeholder="Member name" class="flex-1"
+                            onkeydown="if(event.key==='Enter')addMember()">
+                        <button class="btn btn-primary" onclick="addMember()">Add</button>
+                    </div>
+                    <div class="member-badges" id="memberBadges"></div>
+                </div>
+
+                <div class="card accent-border">
+                    <div class="card-label"><span>📝</span> Record a Meal</div>
+                    <div class="input-row">
+                        <div class="field">
+                            <label>Location</label>
+                            <input type="text" id="location" placeholder="e.g. Central, Amazon, Wude">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="field">
+                            <label for="mealType">Meal Type</label>
+                            <select id="mealType" title="Meal Type">
+                                <option>Breakfast</option>
+                                <option>Lunch</option>
+                                <option>Dinner</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Total Price (ETB)</label>
+                            <input type="number" id="totalPrice" placeholder="0.00" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="student-grid" id="studentGrid"></div>
+
+                    <button class="btn btn-green btn-full" onclick="saveToHistory()">
+                        ✓ Save Daily Record
+                    </button>
+                    <button class="btn btn-dark btn-full mt-8" onclick="showShareQR()">
+                        📱 Share App via QR Code
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="col-right">
+                <div class="section-title">Saved History</div>
+
+                <div class="actions-grid">
+                    <button id="browserExportBtn" class="btn btn-dark" onclick="exportToExcel()">
+                        📊 Export Excel
+                    </button>
+                    <button class="btn btn-dark" onclick="exportToPDF()">
+                        📄 Export PDF
+                    </button>
+                </div>
+
+                <div class="apk-note" id="apkDownloadLink">
+                    Excel download is limited inside the App. &nbsp;
+                    <a id="chromeLink" href="#" target="_blank">Open in Chrome to download →</a>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>Date(E.C)</th>
+                                    <th>Location</th>
+                                    <th>Meal</th>
+                                    <th>Total</th>
+                                    <th>Split</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="summary-card" id="summaryBox">
+                    <h4>📊 Monthly Summary</h4>
+                    <div id="summaryContent">
+                        <div class="empty-state">
+                            <div class="icon">📋</div>
+                            <p>No records yet. Save a meal to see the summary.</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div class="input-row">
-            <div class="field">
-                <label>Meal Type</label>
-                <select id="mealType">
-                    <option>Breakfast</option>
-                    <option>Lunch</option>
-                    <option>Dinner</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Total Price (ETB)</label>
-                <input type="number" id="totalPrice" placeholder="0.00" oninput="calculate()">
-            </div>
-        </div>
 
-        <div class="student-grid" id="studentGrid"></div>
-
-        <button class="btn btn-green btn-full" onclick="saveToHistory()">
-            ✓ Save Daily Record
+        <button class="btn btn-red btn-sm mt-4" onclick="clearAllData()">
+            🗑 Clear All Data
         </button>
-        <button class="btn btn-dark btn-full" style="margin-top:8px" onclick="showShareQR()">
-            📱 Share App via QR Code
-        </button>
-    </div>
 
     </div>
 
-    <div class="col-right">
-    <div class="section-title">Saved History</div>
+    <div class="toast" id="toast"></div>
 
-    <div class="actions-grid">
-        <button id="browserExportBtn" class="btn btn-dark" onclick="exportToExcel()">
-            📊 Export Excel
-        </button>
-        <button class="btn btn-dark" onclick="exportToPDF()">
-            📄 Export PDF
-        </button>
-    </div>
-
-    <div class="apk-note" id="apkDownloadLink">
-        Excel download is limited inside the App. &nbsp;
-        <a id="chromeLink" href="#" target="_blank">Open in Chrome to download →</a>
-    </div>
-
-    <div class="table-card">
-        <div class="table-scroll">
-            <table id="historyTable">
-                <thead>
-                    <tr>
-                        <th>Date(E.C)</th>
-                        <th>Location</th>
-                        <th>Meal</th>
-                        <th>Total</th>
-                        <th>Split</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="summary-card" id="summaryBox">
-        <h4>📊 Monthly Summary</h4>
-        <div id="summaryContent">
-            <div class="empty-state">
-                <div class="icon">📋</div>
-                <p>No records yet. Save a meal to see the summary.</p>
+    <div id="modernModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title" id="modalHead">Notification</div>
+            <div class="modal-msg" id="modalBody"></div>
+            <div id="modalInputArea"></div>
+            <div id="qrcode"></div>
+            <div class="modal-footer">
+                <button id="modalCancel" class="btn btn-dark" onclick="closeModal()">Cancel</button>
+                <button id="modalConfirm" class="btn btn-primary">OK</button>
             </div>
         </div>
     </div>
 
-    </div>
-    </div>
-
-    <button class="btn btn-red btn-sm" onclick="clearAllData()" style="margin-top:4px">
-        🗑 Clear All Data
-    </button>
-
-</div>
-
-<div class="toast" id="toast"></div>
-
-<div id="modernModal" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-title" id="modalHead">Notification</div>
-        <div class="modal-msg" id="modalBody"></div>
-        <div id="modalInputArea"></div>
-        <div id="qrcode"></div>
-        <div class="modal-footer">
-            <button id="modalCancel" class="btn btn-dark" onclick="closeModal()">Cancel</button>
-            <button id="modalConfirm" class="btn btn-primary">OK</button>
-        </div>
-    </div>
-</div>
-
-<div id="editModal" class="modal-overlay" style="z-index:10000">
-    <div class="modal-box">
-        <div class="modal-title">✏️ Edit Meal Record</div>
-        <div class="input-row"><div class="field"><label>Date (E.C)</label><input type="text" id="editDate"></div></div>
-        <div class="input-row"><div class="field"><label>Location</label><input type="text" id="editLoc"></div></div>
-        <div class="input-row">
-            <div class="field"><label>Meal</label>
-                <select id="editMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option></select>
+    <div id="editModal" class="modal-overlay high-z">
+        <div class="modal-box">
+            <div class="modal-title">✏️ Edit Meal Record</div>
+            <div class="input-row">
+                <div class="field"><label>Date (E.C)</label><input type="text" id="editDate"></div>
             </div>
-            <div class="field"><label>Total Price (ETB)</label><input type="number" id="editTotal"></div>
-        </div>
-        <div class="card-label" style="margin:14px 0 8px"><span>👥</span> Participants</div>
-        <div id="editMemberChecklist" style="border:1px solid var(--border); border-radius:10px; padding:6px; margin-bottom:18px;"></div>
-        <div class="modal-footer">
-            <button class="btn btn-dark" onclick="document.getElementById('editModal').classList.remove('show')">Cancel</button>
-            <button class="btn btn-primary" id="saveEditBtn">Update Record</button>
+            <div class="input-row">
+                <div class="field"><label>Location</label><input type="text" id="editLoc"></div>
+            </div>
+            <div class="input-row">
+                <div class="field"><label>Meal</label>
+                    <select id="editMeal">
+                        <option>Breakfast</option>
+                        <option>Lunch</option>
+                        <option>Dinner</option>
+                    </select>
+                </div>
+                <div class="field"><label>Total Price (ETB)</label><input type="number" id="editTotal"></div>
+            </div>
+            <div class="card-label card-label-compact"><span>👥</span> Participants</div>
+            <div id="editMemberChecklist" class="edit-members"></div>
+            <div class="modal-footer">
+                <button class="btn btn-dark"
+                    onclick="document.getElementById('editModal').classList.remove('show')">Cancel</button>
+                <button class="btn btn-primary" id="saveEditBtn">Update Record</button>
+            </div>
         </div>
     </div>
-</div>
 
-<footer>
-    &copy; 2026 Non-Cafe System &bull; <a href="https://aychew1229.github.io/PersonalPortfolio" target="_blank">Contact</a> <br>
-    Made with ❤️ for Ethiopian university students 
-</footer>
+    <footer>
+        &copy; 2026 Non-Cafe System &bull; <a href="https://aychew1229.github.io/PersonalPortfolio"
+            target="_blank" rel="noopener">Contact</a> <br>
+        Made with ❤️ for Ethiopian university students
+    </footer>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBlrxItFnPQj2z59463KYIJMTGF0sQXjDk",
-        authDomain: "non-cafe-system.firebaseapp.com",
-        databaseURL: "https://non-cafe-system-default-rtdb.firebaseio.com",
-        projectId: "non-cafe-system",
-        storageBucket: "non-cafe-system.firebasestorage.app",
-        messagingSenderId: "502111895079",
-        appId: "1:502111895079:web:56e9d756fa83d911611802",
-        measurementId: "G-2JLVY4MBE4"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    let groupID = urlParams.get('group') || "public_normal";
-    let groupRef = db.ref('groups/' + groupID);
-
-    document.getElementById('currentGroupDisplay').innerText = "Group: " + groupID;
-    document.getElementById('groupInput').value = groupID;
-
-    let members = [];
-    let historyEntries = [];
-
-    /* ─── TOAST ─── */
-    let toastTimer;
-    function showToast(msg, type = 'info') {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast show ' + type;
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => { t.classList.remove('show'); }, 2800);
-    }
-
-    /* ─── PLATFORM INIT ─── */
-    function initPlatform() {
-        const isAPK = navigator.userAgent.toLowerCase().includes("wv") || window.location.protocol === "file:";
-        const chromeLink = document.getElementById('chromeLink');
-        chromeLink.href = "https://robel1229.github.io/non-cafe/?group=" + groupID;
-        if (isAPK) {
-            document.getElementById('browserExportBtn').style.display = 'none';
-            document.getElementById('apkDownloadLink').style.display = 'block';
-        }
-    }
-
-    /* ─── FIXED MEAL TYPE LOGIC (ETHIOPIAN TIME) ─── */
-    function setSmartMealDefault() {
-        const now = new Date();
-        const hr = now.getHours();
-        let ethHour;
-        if (hr >= 6) { ethHour = hr - 6; }
-        else { ethHour = hr + 18; }
-        const s = document.getElementById('mealType');
-        if (ethHour >= 0 && ethHour < 6) {
-            s.value = "Breakfast";
-        } else if (ethHour >= 6 && ethHour <= 10) {
-            s.value = "Lunch";
-        } else {
-            s.value = "Dinner";
-        }
-    }
-
-    window.onload = function () { initPlatform(); setSmartMealDefault(); };
-
-    /* ─── MODAL ─── */
-    function showNotification({ title, msg, onConfirm = null, isConfirmType = false, isPassword = false }) {
-        const modal = document.getElementById('modernModal');
-        const confirmBtn = document.getElementById('modalConfirm');
-        const cancelBtn = document.getElementById('modalCancel');
-        const inputArea = document.getElementById('modalInputArea');
-        document.getElementById('qrcode').innerHTML = "";
-        document.getElementById('modalHead').innerText = title;
-        document.getElementById('modalBody').innerText = msg;
-        inputArea.innerHTML = isPassword
-            ? '<input type="password" id="modalPassInput" class="modal-input" placeholder="Enter password...">'
-            : '';
-        modal.classList.add('show');
-        cancelBtn.style.display = (isConfirmType || isPassword) ? '' : 'none';
-        confirmBtn.onclick = () => {
-            let passVal = isPassword ? document.getElementById('modalPassInput').value : null;
-            closeModal();
-            if (onConfirm) onConfirm(passVal);
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlrxItFnPQj2z59463KYIJMTGF0sQXjDk",
+            authDomain: "non-cafe-system.firebaseapp.com",
+            databaseURL: "https://non-cafe-system-default-rtdb.firebaseio.com",
+            projectId: "non-cafe-system",
+            storageBucket: "non-cafe-system.firebasestorage.app",
+            messagingSenderId: "502111895079",
+            appId: "1:502111895079:web:56e9d756fa83d911611802",
+            measurementId: "G-2JLVY4MBE4"
         };
-    }
-    
-function closeModal() { 
-    document.getElementById('modernModal').classList.remove('show'); 
-}
 
-    /* ─── GROUP ─── */
-    function switchGroup() {
-        const newGroup = document.getElementById('groupInput').value.trim();
-        if (!newGroup) return;
-        db.ref('groups/' + newGroup + '/password').once('value', (snap) => {
-            const existingPass = snap.val();
-            if (existingPass) {
-                showNotification({
-                    title: "Group Access Code?", msg: "Please Enter the code to join this session:", isPassword: true,
-                    onConfirm: (p) => {
-                        if (p === existingPass) window.location.href = window.location.pathname + '?group=' + newGroup;
-                        else showNotification({ title: "Access Denied", msg: "Incorrect password." });
-                    }
-                });
-            } else {
-                showNotification({
-                    title: "Join Group", msg: `Join "${newGroup}"? Set a password to make it private (leave blank for public).`, isPassword: true,
-                    isConfirmType: true,
-                    onConfirm: (p) => {
-                        if (p) db.ref('groups/' + newGroup + '/password').set(p);
-                        window.location.href = window.location.pathname + '?group=' + newGroup;
-                    }
-                });
-            }
-        });
-    }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    /* ─── FIREBASE LISTENER ─── */
-    groupRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            members = data.members || [];
-            const histObj = data.history || {};
-            historyEntries = Object.keys(histObj).map(key => ({ id: key, ...histObj[key] }))
-                .sort((a, b) => {
-                    const p = s => s.split(' ')[0].split('/');
-                    const [dA, dB] = [p(a.date), p(b.date)];
-                    return new Date(dB[2], dB[1]-1, dB[0]) - new Date(dA[2], dA[1]-1, dA[0]);
-                });
-        } else { members = []; historyEntries = []; }
-        renderMembers(); renderHistory();
-    });
+        const urlParams = new URLSearchParams(window.location.search);
+        let groupID = urlParams.get('group') || "public_normal";
+        let groupRef = db.ref('groups/' + groupID);
 
-    /* ─── MEMBERS ─── */
-    function addMember() {
-        const name = document.getElementById('newMemberName').value.trim();
-        if (name && !members.includes(name)) {
-            members.push(name);
-            groupRef.update({ members });
-            document.getElementById('newMemberName').value = '';
+        document.getElementById('currentGroupDisplay').innerText = "Group: " + groupID;
+        document.getElementById('groupInput').value = groupID;
+
+        let members = [];
+        let historyEntries = [];
+
+        /* ─── TOAST ─── */
+        let toastTimer;
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { t.classList.remove('show'); }, 2800);
         }
-    }
 
-    function renderMembers() {
-        const grid = document.getElementById('studentGrid');
-        const badges = document.getElementById('memberBadges');
-        grid.innerHTML = ''; badges.innerHTML = '';
-        members.forEach(name => {
-            const b = document.createElement('span');
-            b.className = 'member-badge';
-            b.textContent = name;
-            badges.appendChild(b);
-            const card = document.createElement('div');
-            card.className = 'student-card active';
-            card.dataset.name = name;
-            card.innerHTML = `
+        /* ─── PLATFORM INIT ─── */
+        function initPlatform() {
+            const isAPK = navigator.userAgent.toLowerCase().includes("wv") || window.location.protocol === "file:";
+            const chromeLink = document.getElementById('chromeLink');
+            chromeLink.href = "https://robel1229.github.io/non-cafe/?group=" + groupID;
+            if (isAPK) {
+                document.getElementById('browserExportBtn').style.display = 'none';
+                document.getElementById('apkDownloadLink').style.display = 'block';
+            }
+        }
+
+        /* ─── FIXED MEAL TYPE LOGIC (ETHIOPIAN TIME) ─── */
+        function setSmartMealDefault() {
+            const now = new Date();
+            const hr = now.getHours();
+            let ethHour;
+            if (hr >= 6) { ethHour = hr - 6; }
+            else { ethHour = hr + 18; }
+            const s = document.getElementById('mealType');
+            if (ethHour >= 0 && ethHour < 6) {
+                s.value = "Breakfast";
+            } else if (ethHour >= 6 && ethHour <= 10) {
+                s.value = "Lunch";
+            } else {
+                s.value = "Dinner";
+            }
+        }
+
+        window.onload = function () { initPlatform(); setSmartMealDefault(); };
+
+        /* ─── MODAL ─── */
+        function showNotification({ title, msg, onConfirm = null, isConfirmType = false, isPassword = false }) {
+            const modal = document.getElementById('modernModal');
+            const confirmBtn = document.getElementById('modalConfirm');
+            const cancelBtn = document.getElementById('modalCancel');
+            const inputArea = document.getElementById('modalInputArea');
+            document.getElementById('qrcode').innerHTML = "";
+            document.getElementById('modalHead').innerText = title;
+            document.getElementById('modalBody').innerText = msg;
+            inputArea.innerHTML = isPassword
+                ? '<input type="password" id="modalPassInput" class="modal-input" placeholder="Enter password...">'
+                : '';
+            modal.classList.add('show');
+            cancelBtn.style.display = (isConfirmType || isPassword) ? '' : 'none';
+            confirmBtn.onclick = () => {
+                let passVal = isPassword ? document.getElementById('modalPassInput').value : null;
+                closeModal();
+                if (onConfirm) onConfirm(passVal);
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('modernModal').classList.remove('show');
+        }
+
+        /* ─── GROUP ─── */
+        function switchGroup() {
+            const newGroup = document.getElementById('groupInput').value.trim();
+            if (!newGroup) return;
+            db.ref('groups/' + newGroup + '/password').once('value', (snap) => {
+                const existingPass = snap.val();
+                if (existingPass) {
+                    showNotification({
+                        title: "Group Access Code?", msg: "Please Enter the code to join this session:", isPassword: true,
+                        onConfirm: (p) => {
+                            if (p === existingPass) window.location.href = window.location.pathname + '?group=' + newGroup;
+                            else showNotification({ title: "Access Denied", msg: "Incorrect password." });
+                        }
+                    });
+                } else {
+                    showNotification({
+                        title: "Join Group", msg: `Join "${newGroup}"? Set a password to make it private (leave blank for public).`, isPassword: true,
+                        isConfirmType: true,
+                        onConfirm: (p) => {
+                            if (p) db.ref('groups/' + newGroup + '/password').set(p);
+                            window.location.href = window.location.pathname + '?group=' + newGroup;
+                        }
+                    });
+                }
+            });
+        }
+
+        /* ─── FIREBASE LISTENER ─── */
+        groupRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                members = data.members || [];
+                const histObj = data.history || {};
+                historyEntries = Object.keys(histObj).map(key => ({ id: key, ...histObj[key] }))
+                    .sort((a, b) => {
+                        const p = s => s.split(' ')[0].split('/');
+                        const [dA, dB] = [p(a.date), p(b.date)];
+                        return new Date(dB[2], dB[1] - 1, dB[0]) - new Date(dA[2], dA[1] - 1, dA[0]);
+                    });
+            } else { members = []; historyEntries = []; }
+            renderMembers(); renderHistory();
+        });
+
+        /* ─── MEMBERS ─── */
+        function addMember() {
+            const name = document.getElementById('newMemberName').value.trim();
+            if (name && !members.includes(name)) {
+                members.push(name);
+                groupRef.update({ members });
+                document.getElementById('newMemberName').value = '';
+            }
+        }
+
+        function renderMembers() {
+            const grid = document.getElementById('studentGrid');
+            const badges = document.getElementById('memberBadges');
+            grid.innerHTML = ''; badges.innerHTML = '';
+            members.forEach(name => {
+                const b = document.createElement('span');
+                b.className = 'member-badge';
+                b.textContent = name;
+                badges.appendChild(b);
+                const card = document.createElement('div');
+                card.className = 'student-card active';
+                card.dataset.name = name;
+                card.innerHTML = `
                 <input type="checkbox" class="s-check member-check" checked data-name="${name}" onchange="toggleCard(this);calculate()">
                 <div class="s-name">${name}</div>
                 <div class="s-cost" id="cost-${name}">0.00</div>
             `;
-            card.onclick = (e) => {
-                if (e.target.tagName !== 'INPUT') {
-                    const cb = card.querySelector('.member-check');
-                    cb.checked = !cb.checked;
-                    toggleCard(cb); calculate();
+                card.onclick = (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        const cb = card.querySelector('.member-check');
+                        cb.checked = !cb.checked;
+                        toggleCard(cb); calculate();
+                    }
+                };
+                grid.appendChild(card);
+            });
+            calculate();
+        }
+
+        function toggleCard(cb) {
+            const card = cb.closest('.student-card');
+            card.classList.toggle('active', cb.checked);
+            const cost = document.getElementById('cost-' + cb.dataset.name);
+            if (!cb.checked && cost) { cost.textContent = '0.00'; cost.className = 's-cost zero'; }
+        }
+
+        /* ─── CALCULATE ─── */
+        function roundUp(n) { return Math.ceil(n * 100) / 100; }
+
+        function calculate() {
+            const total = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const checks = document.querySelectorAll('.member-check');
+            let active = 0;
+            checks.forEach(c => { if (c.checked) active++; });
+            const per = active > 0 ? roundUp(total / active) : 0;
+            checks.forEach(c => {
+                const el = document.getElementById('cost-' + c.dataset.name);
+                if (el) {
+                    el.textContent = c.checked ? per.toFixed(2) : '0.00';
+                    el.className = 's-cost' + (!c.checked ? ' zero' : '');
                 }
-            };
-            grid.appendChild(card);
-        });
-        calculate();
-    }
+            });
+        }
 
-    function toggleCard(cb) {
-        const card = cb.closest('.student-card');
-        card.classList.toggle('active', cb.checked);
-        const cost = document.getElementById('cost-' + cb.dataset.name);
-        if (!cb.checked && cost) { cost.textContent = '0.00'; cost.className = 's-cost zero'; }
-    }
-
-    /* ─── CALCULATE ─── */
-    function roundUp(n) { return Math.ceil(n * 100) / 100; }
-
-    function calculate() {
-        const total = parseFloat(document.getElementById('totalPrice').value) || 0;
-        const checks = document.querySelectorAll('.member-check');
-        let active = 0;
-        checks.forEach(c => { if (c.checked) active++; });
-        const per = active > 0 ? roundUp(total / active) : 0;
-        checks.forEach(c => {
-            const el = document.getElementById('cost-' + c.dataset.name);
-            if (el) {
-                el.textContent = c.checked ? per.toFixed(2) : '0.00';
-                el.className = 's-cost' + (!c.checked ? ' zero' : '');
+        /* ─── ETHIOPIAN DATE LOGIC ─── */
+        function getEthiopianDate() {
+            const now = new Date();
+            let gDay = now.getDate();
+            let gMonth = now.getMonth() + 1;
+            let gYear = now.getFullYear();
+            let eYear = gYear - 8;
+            let eMonth, eDay;
+            const isGregorianLeap = (gYear % 4 === 0 && gYear % 100 !== 0) || (gYear % 400 === 0);
+            const daysInMonth = [0, 31, isGregorianLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            let gDayOfYear = 0;
+            for (let i = 1; i < gMonth; i++) gDayOfYear += daysInMonth[i];
+            gDayOfYear += gDay;
+            // New Year's day-of-year shifts to 255 either when the current year
+            // itself is a leap year (Feb has 29 days) OR when the following year
+            // is a leap year (Enkutatash moves from Sept 11 to Sept 12).
+            let newYearDay = (isGregorianLeap || ((gYear + 1) % 4 === 0)) ? 255 : 254;
+            if (gDayOfYear >= newYearDay) {
+                eYear = gYear - 7;
+                let diff = gDayOfYear - newYearDay;
+                eMonth = Math.floor(diff / 30) + 1;
+                eDay = (diff % 30) + 1;
+            } else {
+                eYear = gYear - 8;
+                let diff = gDayOfYear + (isGregorianLeap ? 366 : 365) - newYearDay;
+                eMonth = Math.floor(diff / 30) + 1;
+                eDay = (diff % 30) + 1;
             }
-        });
-    }
-
-    /* ─── ETHIOPIAN DATE LOGIC ─── */
-    function getEthiopianDate() {
-        const now = new Date();
-        let gDay = now.getDate();
-        let gMonth = now.getMonth() + 1;
-        let gYear = now.getFullYear();
-        let eYear = gYear - 8;
-        let eMonth, eDay;
-        const isGregorianLeap = (gYear % 4 === 0 && gYear % 100 !== 0) || (gYear % 400 === 0);
-        const daysInMonth = [0, 31, isGregorianLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        let gDayOfYear = 0;
-        for (let i = 1; i < gMonth; i++) gDayOfYear += daysInMonth[i];
-        gDayOfYear += gDay;
-        // New Year's day-of-year shifts to 255 either when the current year
-        // itself is a leap year (Feb has 29 days) OR when the following year
-        // is a leap year (Enkutatash moves from Sept 11 to Sept 12).
-        let newYearDay = (isGregorianLeap || ((gYear + 1) % 4 === 0)) ? 255 : 254;
-        if (gDayOfYear >= newYearDay) {
-            eYear = gYear - 7;
-            let diff = gDayOfYear - newYearDay;
-            eMonth = Math.floor(diff / 30) + 1;
-            eDay = (diff % 30) + 1;
-        } else {
-            eYear = gYear - 8;
-            let diff = gDayOfYear + (isGregorianLeap ? 366 : 365) - newYearDay;
-            eMonth = Math.floor(diff / 30) + 1;
-            eDay = (diff % 30) + 1;
-        }
-        return `${String(eDay).padStart(2, '0')}/${String(eMonth).padStart(2, '0')}/${eYear}`;
-    }
-
-    /* ─── SAVE ─── */
-    function saveToHistory() {
-        const loc = document.getElementById('location').value.trim();
-        const price = parseFloat(document.getElementById('totalPrice').value);
-        const checks = document.querySelectorAll('.member-check');
-        const active = Array.from(checks).filter(c => c.checked);
-        if (!loc || !price || active.length === 0) {
-            showToast('Check location, price & members.', 'error'); return;
-        }
-        const per = roundUp(price / active.length);
-        let detailText = [], detailData = {};
-        active.forEach(c => {
-            detailText.push(`${c.dataset.name}(${per.toFixed(2)})`);
-            detailData[c.dataset.name] = per;
-        });
-        const record = {
-            date: getEthiopianDate(),
-            location: loc,
-            meal: document.getElementById('mealType').value,
-            total: price,
-            details: detailText.join(', '),
-            individualCosts: detailData
-        };
-        groupRef.child('history').push(record);
-        document.getElementById('location').value = '';
-        document.getElementById('totalPrice').value = '';
-        calculate(); setSmartMealDefault();
-        showToast('Record saved to ' + groupID, 'success');
-    }
-
-    /* ─── RENDER HISTORY ─── */
-    function renderHistory() {
-        const tbody = document.querySelector('#historyTable tbody');
-        tbody.innerHTML = '';
-        let locationGroups = {}, studentGrandTotals = {}, absoluteTotal = 0;
-        members.forEach(m => studentGrandTotals[m] = 0);
-
-        if (historyEntries.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">🍽</div><p>No meals saved yet.</p></div></td></tr>';
+            return `${String(eDay).padStart(2, '0')}/${String(eMonth).padStart(2, '0')}/${eYear}`;
         }
 
-        historyEntries.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+        /* ─── SAVE ─── */
+        function saveToHistory() {
+            const loc = document.getElementById('location').value.trim();
+            const price = parseFloat(document.getElementById('totalPrice').value);
+            const checks = document.querySelectorAll('.member-check');
+            const active = Array.from(checks).filter(c => c.checked);
+            if (!loc || !price || active.length === 0) {
+                showToast('Check location, price & members.', 'error'); return;
+            }
+            const per = roundUp(price / active.length);
+            let detailText = [], detailData = {};
+            active.forEach(c => {
+                detailText.push(`${c.dataset.name}(${per.toFixed(2)})`);
+                detailData[c.dataset.name] = per;
+            });
+            const record = {
+                date: getEthiopianDate(),
+                location: loc,
+                meal: document.getElementById('mealType').value,
+                total: price,
+                details: detailText.join(', '),
+                individualCosts: detailData
+            };
+            groupRef.child('history').push(record);
+            document.getElementById('location').value = '';
+            document.getElementById('totalPrice').value = '';
+            calculate(); setSmartMealDefault();
+            showToast('Record saved to ' + groupID, 'success');
+        }
+
+        /* ─── RENDER HISTORY ─── */
+        function renderHistory() {
+            const tbody = document.querySelector('#historyTable tbody');
+            tbody.innerHTML = '';
+            let locationGroups = {}, studentGrandTotals = {}, absoluteTotal = 0;
+            members.forEach(m => studentGrandTotals[m] = 0);
+
+            if (historyEntries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">🍽</div><p>No meals saved yet.</p></div></td></tr>';
+            }
+
+            historyEntries.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                 <td style="font-family:'JetBrains Mono',monospace; font-size:11px">${item.date}</td>
                 <td class="td-loc">${item.location}</td>
                 <td><span class="td-meal">${item.meal}</span></td>
@@ -964,226 +1456,227 @@ function closeModal() {
                     <button class="btn-action" title="Edit" onclick="openEditModal('${item.id}')">✏️</button>
                     <button class="btn-action del" title="Delete" onclick="deleteSingleEntry('${item.id}')">🗑</button>
                 </td>`;
-            tbody.appendChild(row);
-            absoluteTotal += (item.total || 0);
-            const locKey = item.location.trim() || "Unknown";
-            if (!locationGroups[locKey]) locationGroups[locKey] = { students: {}, locTotal: 0 };
-            for (let name in item.individualCosts) {
-                const cost = item.individualCosts[name];
-                locationGroups[locKey].students[name] = (locationGroups[locKey].students[name] || 0) + cost;
-                locationGroups[locKey].locTotal += cost;
-                if (studentGrandTotals.hasOwnProperty(name)) studentGrandTotals[name] += cost;
+                tbody.appendChild(row);
+                absoluteTotal += (item.total || 0);
+                const locKey = item.location.trim() || "Unknown";
+                if (!locationGroups[locKey]) locationGroups[locKey] = { students: {}, locTotal: 0 };
+                for (let name in item.individualCosts) {
+                    const cost = item.individualCosts[name];
+                    locationGroups[locKey].students[name] = (locationGroups[locKey].students[name] || 0) + cost;
+                    locationGroups[locKey].locTotal += cost;
+                    if (studentGrandTotals.hasOwnProperty(name)) studentGrandTotals[name] += cost;
+                }
+            });
+
+            const sum = document.getElementById('summaryContent');
+            if (historyEntries.length === 0) {
+                sum.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Save a meal to see the summary.</p></div>';
+                return;
             }
-        });
 
-        const sum = document.getElementById('summaryContent');
-        if (historyEntries.length === 0) {
-            sum.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Save a meal to see the summary.</p></div>';
-            return;
-        }
+            let html = '<div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">📍 By Location</div>';
 
-        let html = '<div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">📍 By Location</div>';
+            for (let loc in locationGroups) {
+                // Escape the location name for safe use in onclick attribute
+                const locEscaped = loc.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const count = historyEntries.filter(e => (e.location.trim() || "Unknown") === loc).length;
 
-        for (let loc in locationGroups) {
-            // Escape the location name for safe use in onclick attribute
-            const locEscaped = loc.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-            const count = historyEntries.filter(e => (e.location.trim() || "Unknown") === loc).length;
-
-            html += `<div class="loc-block">
+                html += `<div class="loc-block">
                 <div class="loc-block-header">
                     <div class="loc-block-name">📍 ${loc}</div>
                     <button class="btn-del-loc" onclick="deleteByLocation('${locEscaped}')" title="Delete all ${loc} records">
                         🗑 Delete (${count})
                     </button>
                 </div>`;
-            for (let p in locationGroups[loc].students)
-                html += `<div class="loc-row"><span>${p}</span><span style="font-family:'JetBrains Mono',monospace">${locationGroups[loc].students[p].toFixed(2)} ETB</span></div>`;
-            html += `<div class="loc-total"><span>Total</span><span>${locationGroups[loc].locTotal.toFixed(2)} ETB</span></div></div>`;
-        }
+                for (let p in locationGroups[loc].students)
+                    html += `<div class="loc-row"><span>${p}</span><span style="font-family:'JetBrains Mono',monospace">${locationGroups[loc].students[p].toFixed(2)} ETB</span></div>`;
+                html += `<div class="loc-total"><span>Total</span><span>${locationGroups[loc].locTotal.toFixed(2)} ETB</span></div></div>`;
+            }
 
-        html += `<div class="pay-block"><div class="pay-block-title">💳 Individual Totals</div>`;
-        for (let name in studentGrandTotals)
-            html += `<div class="pay-row"><span>${name}</span><span>${studentGrandTotals[name].toFixed(2)} ETB</span></div>`;
-        html += `</div>`;
+            html += `<div class="pay-block"><div class="pay-block-title">💳 Individual Totals</div>`;
+            for (let name in studentGrandTotals)
+                html += `<div class="pay-row"><span>${name}</span><span>${studentGrandTotals[name].toFixed(2)} ETB</span></div>`;
+            html += `</div>`;
 
-        html += `<div class="grand-total-block">
+            html += `<div class="grand-total-block">
             <div class="gt-label">All Students Total Expenditure</div>
             <div class="gt-amount">${absoluteTotal.toFixed(2)} ETB</div>
             <div class="gt-sub">Split across ${members.length} member${members.length !== 1 ? 's' : ''}</div>
         </div>`;
 
-        sum.innerHTML = html;
-    }
-
-    /* ─── DELETE BY LOCATION ─── */
-    function deleteByLocation(locationName) {
-        // Find all entry IDs that match this location
-        const matchingIds = historyEntries
-            .filter(e => (e.location.trim() || "Unknown") === locationName)
-            .map(e => e.id);
-
-        if (matchingIds.length === 0) {
-            showToast('No records found for ' + locationName, 'error');
-            return;
+            sum.innerHTML = html;
         }
 
-        const performDelete = () => {
-            const updates = {};
-            matchingIds.forEach(id => { updates['history/' + id] = null; });
-            groupRef.update(updates).then(() => {
-                showToast(`Deleted ${matchingIds.length} record(s) for "${locationName}"`, 'success');
-            }).catch(err => {
-                showToast('Delete failed: ' + err.message, 'error');
-            });
-        };
+        /* ─── DELETE BY LOCATION ─── */
+        function deleteByLocation(locationName) {
+            // Find all entry IDs that match this location
+            const matchingIds = historyEntries
+                .filter(e => (e.location.trim() || "Unknown") === locationName)
+                .map(e => e.id);
 
-        groupRef.child('password').once('value', (snap) => {
-            const adminPass = snap.val();
-            if (!adminPass || groupID === "public_normal") {
-                showNotification({
-                    title: "Delete Location",
-                    msg: `Remove all ${matchingIds.length} record(s) for "${locationName}"? This cannot be undone.`,
-                    isConfirmType: true,
-                    onConfirm: performDelete
-                });
-            } else {
-                showNotification({
-                    title: "Admin Required",
-                    msg: `Enter password to delete all "${locationName}" records (${matchingIds.length} entries):`,
-                    isPassword: true,
-                    onConfirm: (p) => {
-                        if (p === adminPass) performDelete();
-                        else showNotification({ title: "Denied", msg: "Incorrect password." });
-                    }
-                });
+            if (matchingIds.length === 0) {
+                showToast('No records found for ' + locationName, 'error');
+                return;
             }
-        });
-    }
 
-    /* ─── QR ─── */
-    function showShareQR() {
-        showNotification({ title: "Share Group", msg: `Scan to join "${groupID}"` });
-        setTimeout(() => new QRCode(document.getElementById('qrcode'), { text: window.location.href, width: 180, height: 180 }), 100);
-    }
+            const performDelete = () => {
+                const updates = {};
+                matchingIds.forEach(id => { updates['history/' + id] = null; });
+                groupRef.update(updates).then(() => {
+                    showToast(`Deleted ${matchingIds.length} record(s) for "${locationName}"`, 'success');
+                }).catch(err => {
+                    showToast('Delete failed: ' + err.message, 'error');
+                });
+            };
 
-    /* ─── EDIT ─── */
-    function openEditModal(key) {
-        const record = historyEntries.find(e => e.id === key);
-        if (!record) return;
-        document.getElementById('editDate').value = record.date;
-        document.getElementById('editLoc').value = record.location;
-        document.getElementById('editMeal').value = record.meal;
-        document.getElementById('editTotal').value = record.total;
-        const cl = document.getElementById('editMemberChecklist');
-        cl.innerHTML = '';
-        members.forEach(m => {
-            const isChecked = record.individualCosts.hasOwnProperty(m);
-            cl.innerHTML += `<div class="edit-check-row"><label>${m}</label><input type="checkbox" class="edit-m-check" data-name="${m}" ${isChecked ? 'checked' : ''}></div>`;
-        });
-        document.getElementById('editModal').classList.add('show');
-        document.getElementById('saveEditBtn').onclick = () => {
             groupRef.child('password').once('value', (snap) => {
-                const pass = snap.val();
-                if (!pass || groupID === "public_normal") { performUpdate(key); }
-                else {
-                    document.getElementById('editModal').classList.remove('show');
+                const adminPass = snap.val();
+                if (!adminPass || groupID === "public_normal") {
                     showNotification({
-                        title: "Admin Required", msg: "Enter password to update:", isPassword: true,
-                        onConfirm: (input) => {
-                            if (input === pass) performUpdate(key);
+                        title: "Delete Location",
+                        msg: `Remove all ${matchingIds.length} record(s) for "${locationName}"? This cannot be undone.`,
+                        isConfirmType: true,
+                        onConfirm: performDelete
+                    });
+                } else {
+                    showNotification({
+                        title: "Admin Required",
+                        msg: `Enter password to delete all "${locationName}" records (${matchingIds.length} entries):`,
+                        isPassword: true,
+                        onConfirm: (p) => {
+                            if (p === adminPass) performDelete();
                             else showNotification({ title: "Denied", msg: "Incorrect password." });
                         }
                     });
                 }
             });
-        };
-    }
+        }
 
-    function performUpdate(key) {
-        const date = document.getElementById('editDate').value;
-        const loc = document.getElementById('editLoc').value;
-        const meal = document.getElementById('editMeal').value;
-        const total = parseFloat(document.getElementById('editTotal').value) || 0;
-        const checks = document.querySelectorAll('.edit-m-check');
-        const active = Array.from(checks).filter(c => c.checked);
-        if (!loc || total <= 0 || active.length === 0) { showToast('Valid details required.', 'error'); return; }
-        const per = roundUp(total / active.length);
-        let detailText = [], detailData = {};
-        active.forEach(c => { detailText.push(`${c.dataset.name}(${per.toFixed(2)})`); detailData[c.dataset.name] = per; });
-        groupRef.child('history').child(key).update({ date, location: loc, meal, total, details: detailText.join(', '), individualCosts: detailData });
-        document.getElementById('editModal').classList.remove('show');
-        showToast('Record updated.', 'success');
-    }
+        /* ─── QR ─── */
+        function showShareQR() {
+            showNotification({ title: "Share Group", msg: `Scan to join "${groupID}"` });
+            setTimeout(() => new QRCode(document.getElementById('qrcode'), { text: window.location.href, width: 180, height: 180 }), 100);
+        }
 
-    /* ─── DELETE SINGLE ─── */
-    function deleteSingleEntry(key) {
-        groupRef.child('password').once('value', (snap) => {
-            const adminPass = snap.val();
-            const performDelete = () => groupRef.child('history').child(key).remove();
-            if (!adminPass || groupID === "public_normal") {
-                showNotification({ title: "Delete", msg: "Remove this record?", isConfirmType: true, onConfirm: performDelete });
-            } else {
-                showNotification({
-                    title: "Confirm", msg: "Enter password to delete:", isPassword: true,
-                    onConfirm: (p) => { if (p === adminPass) performDelete(); else showNotification({ title: "Denied", msg: "Incorrect password!" }); }
-                });
-            }
-        });
-    }
-
-    /* ─── EXPORT ─── */
-    function exportToExcel() {
-        try {
-            const data = historyEntries.map(item => Object.assign({ date: item.date, location: item.location, meal: item.meal, total: item.total }, item.individualCosts));
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Meal History");
-            XLSX.writeFile(wb, "Meal_History_" + groupID + ".xlsx");
-            showToast('Excel exported.', 'success');
-        } catch (e) { showToast('Export failed: ' + e.message, 'error'); }
-    }
-
-    function exportToPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(18); doc.setTextColor(249, 115, 22);
-        doc.text(`Meal Report: ${groupID}`, 14, 20);
-        doc.setFontSize(10); doc.setTextColor(120);
-        doc.text(`Generated: ${getEthiopianDate()}`, 14, 28);
-        doc.autoTable({
-            html: '#historyTable', startY: 35, theme: 'striped',
-            headStyles: { fillColor: [249, 115, 22] },
-        });
-        const finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(13); doc.setTextColor(34, 197, 94);
-        doc.text("Summary", 14, finalY);
-        doc.setFontSize(10); doc.setTextColor(0);
-        document.querySelectorAll('#summaryBox .loc-row, #summaryBox .pay-row').forEach((el, i) => {
-            doc.text(el.innerText.replace(/\n/g, ': '), 14, finalY + 8 + i * 7);
-        });
-        doc.save(`Meal_Report_${groupID}.pdf`);
-        showToast('PDF exported.', 'success');
-    }
-
-    /* ─── CLEAR ALL ─── */
-    function clearAllData() {
-        groupRef.child('password').once('value', (snap) => {
-            const adminPass = snap.val();
-            const performClear = () => {
-                showNotification({
-                    title: "Final Check", msg: "Clear ALL history and members?", isConfirmType: true,
-                    onConfirm: () => { groupRef.child('history').remove(); groupRef.child('members').remove(); location.reload(); }
+        /* ─── EDIT ─── */
+        function openEditModal(key) {
+            const record = historyEntries.find(e => e.id === key);
+            if (!record) return;
+            document.getElementById('editDate').value = record.date;
+            document.getElementById('editLoc').value = record.location;
+            document.getElementById('editMeal').value = record.meal;
+            document.getElementById('editTotal').value = record.total;
+            const cl = document.getElementById('editMemberChecklist');
+            cl.innerHTML = '';
+            members.forEach(m => {
+                const isChecked = record.individualCosts.hasOwnProperty(m);
+                cl.innerHTML += `<div class="edit-check-row"><label>${m}</label><input type="checkbox" class="edit-m-check" data-name="${m}" ${isChecked ? 'checked' : ''}></div>`;
+            });
+            document.getElementById('editModal').classList.add('show');
+            document.getElementById('saveEditBtn').onclick = () => {
+                groupRef.child('password').once('value', (snap) => {
+                    const pass = snap.val();
+                    if (!pass || groupID === "public_normal") { performUpdate(key); }
+                    else {
+                        document.getElementById('editModal').classList.remove('show');
+                        showNotification({
+                            title: "Admin Required", msg: "Enter password to update:", isPassword: true,
+                            onConfirm: (input) => {
+                                if (input === pass) performUpdate(key);
+                                else showNotification({ title: "Denied", msg: "Incorrect password." });
+                            }
+                        });
+                    }
                 });
             };
-            if (!adminPass || groupID === "public_normal") performClear();
-            else {
-                showNotification({
-                    title: "Confirm", msg: "Enter password to clear:", isPassword: true,
-                    onConfirm: (p) => { if (p === adminPass) performClear(); else showNotification({ title: "Denied", msg: "Incorrect password." }); }
-                });
-            }
-        });
-    }
-</script>
+        }
+
+        function performUpdate(key) {
+            const date = document.getElementById('editDate').value;
+            const loc = document.getElementById('editLoc').value;
+            const meal = document.getElementById('editMeal').value;
+            const total = parseFloat(document.getElementById('editTotal').value) || 0;
+            const checks = document.querySelectorAll('.edit-m-check');
+            const active = Array.from(checks).filter(c => c.checked);
+            if (!loc || total <= 0 || active.length === 0) { showToast('Valid details required.', 'error'); return; }
+            const per = roundUp(total / active.length);
+            let detailText = [], detailData = {};
+            active.forEach(c => { detailText.push(`${c.dataset.name}(${per.toFixed(2)})`); detailData[c.dataset.name] = per; });
+            groupRef.child('history').child(key).update({ date, location: loc, meal, total, details: detailText.join(', '), individualCosts: detailData });
+            document.getElementById('editModal').classList.remove('show');
+            showToast('Record updated.', 'success');
+        }
+
+        /* ─── DELETE SINGLE ─── */
+        function deleteSingleEntry(key) {
+            groupRef.child('password').once('value', (snap) => {
+                const adminPass = snap.val();
+                const performDelete = () => groupRef.child('history').child(key).remove();
+                if (!adminPass || groupID === "public_normal") {
+                    showNotification({ title: "Delete", msg: "Remove this record?", isConfirmType: true, onConfirm: performDelete });
+                } else {
+                    showNotification({
+                        title: "Confirm", msg: "Enter password to delete:", isPassword: true,
+                        onConfirm: (p) => { if (p === adminPass) performDelete(); else showNotification({ title: "Denied", msg: "Incorrect password!" }); }
+                    });
+                }
+            });
+        }
+
+        /* ─── EXPORT ─── */
+        function exportToExcel() {
+            try {
+                const data = historyEntries.map(item => Object.assign({ date: item.date, location: item.location, meal: item.meal, total: item.total }, item.individualCosts));
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Meal History");
+                XLSX.writeFile(wb, "Meal_History_" + groupID + ".xlsx");
+                showToast('Excel exported.', 'success');
+            } catch (e) { showToast('Export failed: ' + e.message, 'error'); }
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(18); doc.setTextColor(249, 115, 22);
+            doc.text(`Meal Report: ${groupID}`, 14, 20);
+            doc.setFontSize(10); doc.setTextColor(120);
+            doc.text(`Generated: ${getEthiopianDate()}`, 14, 28);
+            doc.autoTable({
+                html: '#historyTable', startY: 35, theme: 'striped',
+                headStyles: { fillColor: [249, 115, 22] },
+            });
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(13); doc.setTextColor(34, 197, 94);
+            doc.text("Summary", 14, finalY);
+            doc.setFontSize(10); doc.setTextColor(0);
+            document.querySelectorAll('#summaryBox .loc-row, #summaryBox .pay-row').forEach((el, i) => {
+                doc.text(el.innerText.replace(/\n/g, ': '), 14, finalY + 8 + i * 7);
+            });
+            doc.save(`Meal_Report_${groupID}.pdf`);
+            showToast('PDF exported.', 'success');
+        }
+
+        /* ─── CLEAR ALL ─── */
+        function clearAllData() {
+            groupRef.child('password').once('value', (snap) => {
+                const adminPass = snap.val();
+                const performClear = () => {
+                    showNotification({
+                        title: "Final Check", msg: "Clear ALL history and members?", isConfirmType: true,
+                        onConfirm: () => { groupRef.child('history').remove(); groupRef.child('members').remove(); location.reload(); }
+                    });
+                };
+                if (!adminPass || groupID === "public_normal") performClear();
+                else {
+                    showNotification({
+                        title: "Confirm", msg: "Enter password to clear:", isPassword: true,
+                        onConfirm: (p) => { if (p === adminPass) performClear(); else showNotification({ title: "Denied", msg: "Incorrect password." }); }
+                    });
+                }
+            });
+        }
+    </script>
 </body>
+
 </html>
